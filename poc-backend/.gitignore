@@ -1,0 +1,114 @@
+# -------------------------
+# Python & FastAPI backend
+# -------------------------
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+.venv.bak/
+
+# Build / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other info.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Type checker
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# VSCode / IDE settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+logs/
+
+# Environment variables / secrets
+.env
+.env.*
+*.env
+
+# Database / runtime files
+*.db
+*.sqlite3
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Temporary / local data
+tmp/
+temp/
+__temp__/
+*.tmp
+
+# Cache
+*.cache
+.cache/
+*.bak
+
+# Optional: ignore model files or large artifacts
+*.pt
+*.pth
+*.bin
+*.h5
+
+# -------------------------
+# Custom project folders
+# -------------------------
+
+# Generated artifacts or data exports
+/data/
+outputs/
+artifacts/
