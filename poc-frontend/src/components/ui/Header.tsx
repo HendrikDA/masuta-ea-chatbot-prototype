@@ -21,7 +21,7 @@ export default function Header() {
     >
       <div
         style={{
-          maxWidth: "20em",
+          maxWidth: "30em",
           width: "100%",
           textAlign: "center",
           fontWeight: 600,
@@ -30,7 +30,7 @@ export default function Header() {
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        EA&nbsp;PoC&nbsp;–&nbsp;Qwen&nbsp;Assistant
+        <b>Masuta</b> - Your Enterprise Architecture Assistant
       </div>
     </header>
   );

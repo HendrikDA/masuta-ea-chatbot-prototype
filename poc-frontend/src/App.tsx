@@ -5,6 +5,7 @@ import { Button, Textarea, Text } from "@chakra-ui/react";
 import Header from "./components/ui/Header";
 import { colors } from "./utils/colors";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface ChatMessage {
   role: "user" | "agent";
@@ -103,13 +104,13 @@ export default function App() {
         style={{
           maxWidth: 720,
           margin: "0 auto",
-          paddingBottom: "8rem", // space for the fixed input
+          marginBottom: "4rem", // space for the fixed input
           fontFamily: "system-ui",
         }}
       >
         <Header />
 
-        <div style={{ marginTop: "5rem" }}>
+        <div style={{ marginTop: "5rem", marginBottom: "5rem" }}>
           {chatHistory.map((msg, idx) => {
             const baseStyle: React.CSSProperties = {
               width: "90%",
@@ -120,6 +121,11 @@ export default function App() {
               wordWrap: "break-word",
             };
 
+            const normalized = msg.content
+              .replace(/([.:;])\s*-\s/g, "$1\n- ") // newline after sentence punctuation before a "-"
+              .replace(/\s-\s(?=[A-Z0-9])/g, "\n- ") // ensure each "- " starts on a new line
+              .replace(/\n{3,}/g, "\n\n");
+
             if (msg.role === "user") {
               return (
                 <div
@@ -127,20 +133,48 @@ export default function App() {
                   style={{
                     ...baseStyle,
                     float: "right",
+                    textAlign: "right",
                   }}
                 >
-                  <Text fontWeight="bold" textAlign="right">
-                    You
-                  </Text>
-                  <Text
+                  <Text fontWeight="bold">You</Text>
+                  <div
                     style={{
                       backgroundColor: colors.lightBlue,
                       ...baseStyle,
                       float: "right",
                     }}
                   >
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
-                  </Text>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        ul: (props) => (
+                          <ul
+                            style={{
+                              margin: "0.5rem 0",
+                              paddingLeft: "1.25rem",
+                              listStyleType: "disc",
+                            }}
+                            {...props}
+                          />
+                        ),
+                        ol: (props) => (
+                          <ol
+                            style={{
+                              margin: "0.5rem 0",
+                              paddingLeft: "1.25rem",
+                              listStyleType: "decimal",
+                            }}
+                            {...props}
+                          />
+                        ),
+                        li: (props) => (
+                          <li style={{ margin: "0.15rem 0" }} {...props} />
+                        ),
+                      }}
+                    >
+                      {normalized}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               );
             } else {
@@ -154,9 +188,38 @@ export default function App() {
                   }}
                 >
                   <Text fontWeight="bold">Agent</Text>
-                  <Text style={{ backgroundColor: colors.cream, ...baseStyle }}>
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
-                  </Text>
+                  <div style={{ backgroundColor: colors.cream, ...baseStyle }}>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        ul: (props) => (
+                          <ul
+                            style={{
+                              margin: "0.5rem 0",
+                              paddingLeft: "1.25rem",
+                              listStyleType: "disc",
+                            }}
+                            {...props}
+                          />
+                        ),
+                        ol: (props) => (
+                          <ol
+                            style={{
+                              margin: "0.5rem 0",
+                              paddingLeft: "1.25rem",
+                              listStyleType: "decimal",
+                            }}
+                            {...props}
+                          />
+                        ),
+                        li: (props) => (
+                          <li style={{ margin: "0.15rem 0" }} {...props} />
+                        ),
+                      }}
+                    >
+                      {normalized}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               );
             }
@@ -176,7 +239,7 @@ export default function App() {
                 borderRadius: "12px",
               }}
             >
-              {output}
+              {output ? output : <i>Thinking...</i>}
               <Button
                 onClick={stopStream}
                 disabled={!isStreaming}
@@ -218,7 +281,7 @@ export default function App() {
             overflow="hidden"
             color={colors.dark}
             fontWeight={400}
-            placeholder="Ask <copilot> something about your enterprise architecture..."
+            placeholder="Ask Masuta something about your enterprise architecture..."
             _placeholder={{ color: "inherit" }}
             value={userPrompt}
             resize="none"

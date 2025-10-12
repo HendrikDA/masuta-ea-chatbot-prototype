@@ -10,8 +10,7 @@ class ModelManager:
     def __init__(self, model_id: str = DEFAULT_MODEL, system_prompt: str | None = None):
         self.model_id = model_id
         self.system_prompt = system_prompt or (
-            "You are an Enterprise Architecture assistant. Be concise and ground claims "
-            "in the provided context when available."
+            "You are an assistant in the realm of Enterprise Architecture Management (EAM). You will be speaking with an enterprise architect (EA). Support them within this realm to the best of your ability. If the EA wants to discuss things unrelated to enterprise architecture management, then please tell him that you can only stay on topic. Be concise and ground claims in the provided context when available. Please use correct Markdown syntax for an answer."
         )
         self.tok = AutoTokenizer.from_pretrained(self.model_id, use_fast=True)
 
