@@ -110,7 +110,12 @@ export default function App() {
       >
         <Header />
 
-        <div style={{ marginTop: "5rem", marginBottom: "5rem" }}>
+        <div
+          style={{
+            marginTop: "5rem",
+            marginBottom: "5rem",
+          }}
+        >
           {chatHistory.map((msg, idx) => {
             const baseStyle: React.CSSProperties = {
               width: "90%",
@@ -122,8 +127,16 @@ export default function App() {
             };
 
             const normalized = msg.content
-              .replace(/([.:;])\s*-\s/g, "$1\n- ") // newline after sentence punctuation before a "-"
-              .replace(/\s-\s(?=[A-Z0-9])/g, "\n- ") // ensure each "- " starts on a new line
+              // newline before '###' if it follows right after a sentence
+              .replace(/([.!?])\s*###\s*/g, "$1\n\n### ")
+              // H3 header ends with a dash: '### Title- ' → '### Title\n'
+              .replace(/(###\s.+?)-\s+/g, "$1\n")
+              // newline after sentence punctuation before a "-" (list item)
+              .replace(/([.:;])\s*-\s/g, "$1\n- ")
+              .replace(/([.!?])\s*###\s*/g, "$1\n\n### ")
+              .replace(/(\d+\.)\s*/g, "\n$1 ")
+
+              // collapse excessive line breaks
               .replace(/\n{3,}/g, "\n\n");
 
             if (msg.role === "user") {
@@ -170,6 +183,15 @@ export default function App() {
                         li: (props) => (
                           <li style={{ margin: "0.15rem 0" }} {...props} />
                         ),
+                        h3: (props) => (
+                          <h3
+                            style={{
+                              fontWeight: "bold",
+                              fontSize: "1.1rem",
+                            }}
+                            {...props}
+                          />
+                        ),
                       }}
                     >
                       {normalized}
@@ -214,6 +236,15 @@ export default function App() {
                         ),
                         li: (props) => (
                           <li style={{ margin: "0.15rem 0" }} {...props} />
+                        ),
+                        h3: (props) => (
+                          <h3
+                            style={{
+                              fontWeight: "bold",
+                              fontSize: "1.1rem",
+                            }}
+                            {...props}
+                          />
                         ),
                       }}
                     >

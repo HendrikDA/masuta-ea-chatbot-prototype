@@ -16,6 +16,29 @@ Once everything is setup, you can run
 
 The first time running it will install a few things and take a minute.
 
+#### Neo4j
+
+If your neo4j database is newly setup, then you have to configure a few things in it first.
+
+First, make sure that the following ciphers are run so that all nodes have a common Chunk:
+
+```
+MATCH (n:Application)    WHERE n.description IS NOT NULL SET n:Chunk;MATCH (n:Concept)        WHERE n.description IS NOT NULL SET n:Chunk;
+MATCH (n:Discipline)     WHERE n.description IS NOT NULL SET n:Chunk;
+MATCH (n:Issue)          WHERE n.description IS NOT NULL SET n:Chunk;
+MATCH (n:Layer)          WHERE n.description IS NOT NULL SET n:Chunk;
+MATCH (n:Objective)      WHERE n.description IS NOT NULL SET n:Chunk;
+MATCH (n:Organization)   WHERE n.description IS NOT NULL SET n:Chunk;
+MATCH (n:Process)        WHERE n.description IS NOT NULL SET n:Chunk;
+MATCH (n:Role)           WHERE n.description IS NOT NULL SET n:Chunk;
+```
+
+Then, make sure that the embeddings of the graph database are set by running the populate_embeddings.py file:
+
+> python llm/populate_embeddings.py
+
+#### Ready to run the server
+
 For the server-version run the following (you must activate some Python stuff before running the server)
 
 > source .venv/bin/activate
