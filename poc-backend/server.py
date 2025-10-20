@@ -64,6 +64,15 @@ class ChatResponse(BaseModel):
     conversationId: str
     reply: str
 
+# ---------- Helpers ----------
+def ensure_system_and_inject_context(messages: list, ctx: str) -> None:
+    """Make sure the first message is a system message and inject [CONTEXT]."""
+    if not messages or messages[0].get("role") != "system":
+        # insert as first element to guarantee order
+        messages.insert(0, {"role": "system", "content": mm.system_prompt})
+    if ctx:
+        messages[0]["content"] += f"\n\n[CONTEXT]\n{ctx}"
+
 # ---------- Routes ----------
 @app.get("/healthz")
 def healthz():
@@ -75,17 +84,22 @@ def chat(req: ChatRequest):
     if req.system and req.conversationId:
         conv.append(cid, "system", req.system)
 
+    # Append user message and build messages
     conv.append(cid, "user", req.userMessage)
     messages = conv.get_messages(cid)
 
-    # RAG context retrieval
+    # RAG once, inject once, log once
     ctx = mm.retrieve_augmentation(req.userMessage)
-    if messages and messages[0]["role"] == "system":
-        messages[0]["content"] += f"\n\n[CONTEXT]\n{ctx}"
-    print("🔍 Context:\n", ctx)
+    ensure_system_and_inject_context(messages, ctx)
+    print("🔍 RAG Context:\n", ctx)
+    preview_prompt = mm.apply_template(messages)
+    print("🧠 Full Prompt to LLM:\n", preview_prompt)
 
+    # Generate
     params = req.params or ChatParams()
     text = mm.generate(messages, params.max_new_tokens, params.temperature, params.top_p)
+    print("📝 Reply:\n", text)
+
     conv.append(cid, "assistant", text)
     return ChatResponse(conversationId=cid, reply=text)
 
@@ -98,20 +112,20 @@ def chat_stream(req: ChatRequest):
     conv.append(cid, "user", req.userMessage)
     messages = conv.get_messages(cid)
 
+    # RAG once, inject once, log once
     ctx = mm.retrieve_augmentation(req.userMessage)
-    if messages and messages[0]["role"] == "system":
-        messages[0]["content"] += f"\n\n[CONTEXT]\n{ctx}"
-    print("🔍 Context:\n", ctx)
+    ensure_system_and_inject_context(messages, ctx)
+    print("🔍 RAG Context:\n", ctx)
+    preview_prompt = mm.apply_template(messages)
+    print("🧠 Full Prompt to LLM:\n", preview_prompt)
 
     params = req.params or ChatParams()
 
     def sse():
         try:
-            for chunk in mm.stream_generate(
-                messages, params.max_new_tokens, params.temperature, params.top_p
-            ):
+            for chunk in mm.stream_generate(messages, params.max_new_tokens, params.temperature, params.top_p):
                 yield f"data: {chunk}\n\n"
-            yield f"data: [DONE]\n\n"
+            yield "data: [DONE]\n\n"
         except Exception as e:
             yield f"event: error\ndata: {str(e)}\n\n"
 
