@@ -10,7 +10,7 @@ export default function Header() {
         left: 0,
         right: 0,
         height: "3.5rem",
-        backgroundColor: colors.darkBlue,
+        background: colors.dark,
         color: "white",
         display: "flex",
         justifyContent: "center",
