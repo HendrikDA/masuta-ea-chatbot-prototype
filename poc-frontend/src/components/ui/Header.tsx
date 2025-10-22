@@ -16,7 +16,8 @@ export default function Header() {
         justifyContent: "center",
         alignItems: "center",
         zIndex: 1000,
-        boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+        boxShadow: `0 2px 2px ${colors.purple}`,
+        borderColor: colors.purple,
       }}
     >
       <div
