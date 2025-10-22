@@ -87,6 +87,18 @@ def build_prompt_messages(messages: list, ctx: str, max_turns: int = 6) -> list:
     # Return a brand-new list for generation
     return [sys_msg] + trimmed
 
+def build_current_turn_prompt(user_text: str, ctx: str) -> list:
+    """
+    Build a prompt that contains ONLY:
+      - a fresh system message (base system + latest [CONTEXT])
+      - the current user question
+    """
+    sys_msg = {
+        "role": "system",
+        "content": mm.system_prompt + (f"\n\n[CONTEXT]\n{ctx}" if ctx else "")
+    }
+    return [sys_msg, {"role": "user", "content": user_text}]
+
 
 # ---------- Routes ----------
 @app.get("/healthz")
@@ -99,19 +111,17 @@ def chat(req: ChatRequest):
     if req.system and req.conversationId:
         conv.append(cid, "system", req.system)
 
-    # Append user message and build messages
+    # Store the message for your UI/history, but don't send all of it to the LLM
     conv.append(cid, "user", req.userMessage)
-    messages = conv.get_messages(cid)
 
-    # RAG once, inject once, log once
+    # RAG only on the CURRENT user text
     ctx = mm.retrieve_augmentation(req.userMessage)
-    prompt_messages = build_prompt_messages(messages, ctx, max_turns=6)
+    prompt_messages = build_current_turn_prompt(req.userMessage, ctx)
 
     print("🔍 RAG Context:\n", ctx)
     preview_prompt = mm.apply_template(prompt_messages)
     print("🧠 Full Prompt to LLM:\n", preview_prompt)
 
-    # Generate using the trimmed, non-mutating prompt
     params = req.params or ChatParams()
     text = mm.generate(prompt_messages, params.max_new_tokens, params.temperature, params.top_p)
     print("📝 Reply:\n", text)
@@ -121,16 +131,22 @@ def chat(req: ChatRequest):
 
 @app.post("/chat/stream")
 def chat_stream(req: ChatRequest):
+    """
+    SSE streaming endpoint:
+    - Sets Content-Type: text/event-stream
+    - Frames each token chunk as 'data: ...\\n\\n'
+    - Sends a final '[DONE]' event
+    """
     cid = req.conversationId or conv.new_conversation(req.system)
     if req.system and req.conversationId:
         conv.append(cid, "system", req.system)
 
+    # Store for history/UI, but build prompt only from the *current* turn
     conv.append(cid, "user", req.userMessage)
-    messages = conv.get_messages(cid)
 
-    # RAG once, inject once, log once
+    # RAG only on the CURRENT user text
     ctx = mm.retrieve_augmentation(req.userMessage)
-    prompt_messages = build_prompt_messages(messages, ctx, max_turns=6)
+    prompt_messages = build_current_turn_prompt(req.userMessage, ctx)
 
     print("🔍 RAG Context:\n", ctx)
     preview_prompt = mm.apply_template(prompt_messages)
@@ -138,12 +154,33 @@ def chat_stream(req: ChatRequest):
 
     params = req.params or ChatParams()
 
-    def sse():
+    # Underlying token generator from the model (sync generator)
+    token_gen = mm.stream_generate(
+        prompt_messages,
+        params.max_new_tokens,
+        params.temperature,
+        params.top_p
+    )
+
+    # Wrap model tokens into proper SSE frames
+    def sse_wrapper():
         try:
-            for chunk in mm.stream_generate(prompt_messages, params.max_new_tokens, params.temperature, params.top_p):
+            for chunk in token_gen:
+                if not chunk:
+                    continue
+                # Each SSE message must end with a blank line
                 yield f"data: {chunk}\n\n"
+            # Signal completion
             yield "data: [DONE]\n\n"
         except Exception as e:
+            # Surface error to client as an SSE event (optional)
             yield f"data: [ERROR] {str(e)}\n\n"
 
-    return StreamingResponse(sse(), media_type="text/event-stream")
+    headers = {
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        # disable any proxy buffering if present (nginx, etc.)
+        "X-Accel-Buffering": "no",
+    }
+
+    return StreamingResponse(sse_wrapper(), media_type="text/event-stream", headers=headers)

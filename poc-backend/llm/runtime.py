@@ -1,4 +1,3 @@
-# llm/runtime.py
 import torch, threading
 from typing import List, Dict, Generator, Optional
 from transformers import AutoTokenizer, AutoModelForCausalLM, TextIteratorStreamer
@@ -22,6 +21,7 @@ class ModelManager:
         self.system_prompt = system_prompt or (
             "You are an assistant in the realm of Enterprise Architecture Management (EAM). "
             "Support the user using only the information given in [CONTEXT] when available."
+            "Everything you answer should be in the realm of Enterprise Architecture."
         )
         self.tok = AutoTokenizer.from_pretrained(self.model_id, use_fast=True)
 
@@ -31,7 +31,6 @@ class ModelManager:
         self.vector_index = vector_index
 
         # Device setup
-                # Device setup
         if torch.backends.mps.is_available() and not torch.cuda.is_available():
             # fp16 sampling on MPS can be numerically unstable; we'll avoid sampling by default.
             dtype = torch.float16
@@ -56,7 +55,7 @@ class ModelManager:
 
         # ---- RAG single-flight cache ----
         self._rag_lock = threading.Lock()
-        self._rag_last_query: Optional[str] = None
+        self._rag_last_query: Optional[str] = None   # stores normalized cache key
         self._rag_last_result: Optional[str] = None
 
 
@@ -67,17 +66,20 @@ class ModelManager:
         Perform retrieval-augmented generation (RAG):
         - Vector search via vector index
         - Fallback to keyword search
-        Executes only once per unique user query.
+        Executes only once per unique (normalized) user query.
         """
 
-        q = (query or "").strip()
-        if not q:
+        q_raw = (query or "").strip()
+        if not q_raw:
             print("RAG: empty query -> skip.")
             return ""
 
-        # prevent re-entry / loop
+        # Normalize for cache key (lowercase + collapse whitespace to single spaces)
+        q_key = " ".join(q_raw.lower().split())
+
+        # prevent re-entry / loop for identical (normalized) queries
         with self._rag_lock:
-            if self._rag_last_query == q and self._rag_last_result is not None:
+            if self._rag_last_query == q_key and self._rag_last_result is not None:
                 print("RAG: returning cached result for identical query.")
                 return self._rag_last_result
 
@@ -87,7 +89,7 @@ class ModelManager:
             return ""
 
         # --- Build embedding
-        qvec = self.embedder.encode([q])[0].tolist()
+        qvec = self.embedder.encode([q_raw])[0].tolist()
         emb_len = len(qvec)
         print(f"Embedding created. dims={emb_len}  preview={qvec[:8]}...")
 
@@ -153,7 +155,7 @@ class ModelManager:
 
         # ---------- Fallback: keyword search ----------
         if not rows:
-            tokens = [t.strip(".,:;!?()[]\"'") for t in q.lower().split()]
+            tokens = [t.strip(".,:;!?()[]\"'") for t in q_raw.lower().split()]
             tokens = [t for t in tokens if len(t) >= 4]
             kw_list = list(dict.fromkeys(tokens))
             print(f"FALLBACK textual search for tokens: {kw_list}")
@@ -198,9 +200,9 @@ class ModelManager:
             parts.append(f"[{i}] {name}: {ctx}")
         result = "\n".join(parts)
 
-        # Cache result for identical query reuse
+        # Cache result for identical (normalized) query reuse
         with self._rag_lock:
-            self._rag_last_query = q
+            self._rag_last_query = q_key
             self._rag_last_result = result
 
         return result

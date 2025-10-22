@@ -3,7 +3,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, TextIteratorStreamer
 
 MODEL_ID = "Qwen/Qwen2.5-7B-Instruct"   # swap to "Qwen/Qwen2.5-3B-Instruct" if you need lighter
-SYSTEM = "You are an Enterprise Architecture assistant. Be concise. Cite which context item you used when possible."
+SYSTEM = "You are an Enterprise Architecture assistant. Be concise."
 
 def get_device_map():
     if torch.cuda.is_available(): return "auto"
