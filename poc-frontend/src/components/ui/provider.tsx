@@ -13,11 +13,10 @@ export function Provider(props: ColorModeProviderProps) {
     minHeight: "100vh",
   };
   return (
-    // add black background to entire app
     <ChakraProvider value={defaultSystem}>
-      <div style={styles}>
-        <ColorModeProvider {...props} />
-      </div>
+      <ColorModeProvider {...props}>
+        <div style={styles}>{props.children}</div>
+      </ColorModeProvider>
     </ChakraProvider>
   );
 }

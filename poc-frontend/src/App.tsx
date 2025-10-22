@@ -20,25 +20,6 @@ export default function App() {
 
   const controllerRef = useRef<AbortController | null>(null);
   const bufferRef = useRef<string>("");
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-
-  // NEW: Refs for scrollable chat and footer
-  const chatScrollRef = useRef<HTMLDivElement | null>(null);
-  const chatEndRef = useRef<HTMLDivElement | null>(null);
-  const footerRef = useRef<HTMLDivElement | null>(null);
-  const [footerHeight, setFooterHeight] = useState<number>(96); // sensible default
-
-  // Observe footer height to pad the scroll area correctly
-  useEffect(() => {
-    if (!footerRef.current) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const e of entries) {
-        setFooterHeight(e.contentRect.height);
-      }
-    });
-    ro.observe(footerRef.current);
-    return () => ro.disconnect();
-  }, []);
 
   // Append streamed tokens to visible output + buffer
   const appendTokenToUI = useCallback((chunk: string) => {
@@ -55,6 +36,8 @@ export default function App() {
     setIsStreaming(true);
 
     controllerRef.current = new AbortController();
+
+    // Add the user message to the chat history
     setChatHistory((prev) => [...prev, { role: "user", content: userPrompt }]);
 
     try {
@@ -101,7 +84,11 @@ export default function App() {
   }, []);
 
   // Cleanup on unmount
-  useEffect(() => () => controllerRef.current?.abort(), []);
+  useEffect(() => {
+    return () => controllerRef.current?.abort();
+  }, []);
+
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -111,197 +98,243 @@ export default function App() {
     el.style.height = userPrompt === "" ? "3rem" : `${el.scrollHeight}px`;
   }, [userPrompt]);
 
-  // NEW: Auto-scroll to bottom when history/streaming output changes
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [chatHistory, output, isStreaming]);
-
-  // Styles
-  const pageStyle: React.CSSProperties = {
-    minHeight: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    fontFamily: "system-ui",
-  };
-
-  const contentShellStyle: React.CSSProperties = {
-    width: "100%",
-    maxWidth: 720,
-    margin: "0 auto",
-    display: "flex",
-    flexDirection: "column",
-    flex: 1,
-  };
-
-  const chatScrollerStyle: React.CSSProperties = {
-    flex: 1,
-    overflowY: "auto",
-    padding: "0 1rem 1rem 1rem",
-    // reserve space so the fixed footer never covers content
-    paddingBottom: footerHeight + 16,
-  };
-
-  const rowStyle = (role: "user" | "agent"): React.CSSProperties => ({
-    display: "flex",
-    justifyContent: role === "user" ? "flex-end" : "flex-start",
-    marginTop: role === "user" ? "1rem" : "0.75rem",
-  });
-
-  const bubbleStyle = (role: "user" | "agent"): React.CSSProperties => ({
-    maxWidth: "80%",
-    padding: "0.5rem 0.75rem",
-    borderRadius: 12,
-    backgroundColor: role === "user" ? colors.pink : colors.lightBlue,
-    color: role === "user" ? colors.dark : colors.dark,
-    wordWrap: "break-word",
-    whiteSpace: "pre-wrap",
-  });
-
-  const nameStyle: React.CSSProperties = {
-    fontWeight: 700,
-    marginBottom: "0.25rem",
-    fontSize: "0.9rem",
-  };
-
   return (
-    <Provider>
-      <div style={pageStyle}>
-        <div style={contentShellStyle}>
-          <Header />
+    <>
+      <Header />
+      <div
+        style={{
+          maxWidth: 720,
+          margin: "0 auto",
+          // calculate height minus header and input area
+          paddingTop: "2rem",
+          paddingBottom: "8rem",
+          overflowY: "auto",
+          fontFamily: "system-ui",
+        }}
+      >
+        {chatHistory.map((msg, idx) => {
+          const baseStyle: React.CSSProperties = {
+            width: "90%",
+            marginBottom: "0.5rem",
+            padding: "0.5rem 0.75rem",
+            borderRadius: "12px",
+            clear: "both",
+            wordWrap: "break-word",
+          };
 
-          <div ref={chatScrollRef} style={chatScrollerStyle}>
-            {chatHistory.map((msg, idx) => {
-              const normalized = msg.content
-                .replace(/([.!?])\s*###\s*/g, "$1\n\n### ")
-                .replace(/(###\s.+?)-\s+/g, "$1\n")
-                .replace(/([.:;])\s*-\s/g, "$1\n- ")
-                .replace(/([.!?])\s*###\s*/g, "$1\n\n### ")
-                .replace(/(\d+\.)\s*/g, "\n$1 ")
-                .replace(/\n{3,}/g, "\n\n");
+          const normalized = msg.content
+            // newline before '###' if it follows right after a sentence
+            .replace(/([.!?])\s*###\s*/g, "$1\n\n### ")
+            // H3 header ends with a dash: '### Title- ' → '### Title\n'
+            .replace(/(###\s.+?)-\s+/g, "$1\n")
+            // newline after sentence punctuation before a "-" (list item)
+            .replace(/([.:;])\s*-\s/g, "$1\n- ")
+            .replace(/([.!?])\s*###\s*/g, "$1\n\n### ")
+            .replace(/(\d+\.)\s*/g, "\n$1 ")
 
-              return (
-                <div key={idx} style={rowStyle(msg.role)}>
-                  <div style={bubbleStyle(msg.role)}>
-                    <div style={nameStyle}>
-                      {msg.role === "user" ? "You" : "Agent"}
-                    </div>
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      components={{
-                        ul: (props) => (
-                          <ul
-                            style={{
-                              margin: "0.5rem 0",
-                              paddingLeft: "1.25rem",
-                              listStyleType: "disc",
-                            }}
-                            {...props}
-                          />
-                        ),
-                        ol: (props) => (
-                          <ol
-                            style={{
-                              margin: "0.5rem 0",
-                              paddingLeft: "1.25rem",
-                              listStyleType: "decimal",
-                            }}
-                            {...props}
-                          />
-                        ),
-                        li: (props) => (
-                          <li style={{ margin: "0.15rem 0" }} {...props} />
-                        ),
-                        h3: (props) => (
-                          <h3
-                            style={{ fontWeight: "bold", fontSize: "1.1rem" }}
-                            {...props}
-                          />
-                        ),
-                      }}
-                    >
-                      {normalized}
-                    </ReactMarkdown>
-                  </div>
-                </div>
-              );
-            })}
+            // collapse excessive line breaks
+            .replace(/\n{3,}/g, "\n\n");
 
-            {isStreaming && (
-              <div style={rowStyle("agent")}>
+          if (msg.role === "user") {
+            return (
+              <div
+                key={idx}
+                style={{
+                  ...baseStyle,
+                  float: "right",
+                  textAlign: "right",
+                  marginTop: "4rem",
+                }}
+              >
+                <Text fontWeight="bold">You</Text>
                 <div
                   style={{
-                    ...bubbleStyle("agent"),
-                    minHeight: 120,
-                    position: "relative",
+                    backgroundColor: colors.pink,
+                    ...baseStyle,
+                    float: "right",
                   }}
                 >
-                  {output ? output : <i>Thinking...</i>}
-                  <Button
-                    onClick={stopStream}
-                    disabled={!isStreaming}
-                    style={{
-                      position: "absolute",
-                      bottom: "0.5rem",
-                      right: "0.5rem",
-                      backgroundColor: colors.lightBlue,
-                      color: colors.dark,
-                      fontWeight: "bold",
-                      padding: "0.2rem 1rem",
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      ul: (props) => (
+                        <ul
+                          style={{
+                            margin: "0.5rem 0",
+                            paddingLeft: "1.25rem",
+                            listStyleType: "disc",
+                          }}
+                          {...props}
+                        />
+                      ),
+                      ol: (props) => (
+                        <ol
+                          style={{
+                            margin: "0.5rem 0",
+                            paddingLeft: "1.25rem",
+                            listStyleType: "decimal",
+                          }}
+                          {...props}
+                        />
+                      ),
+                      li: (props) => (
+                        <li style={{ margin: "0.15rem 0" }} {...props} />
+                      ),
+                      h3: (props) => (
+                        <h3
+                          style={{
+                            fontWeight: "bold",
+                            fontSize: "1.1rem",
+                          }}
+                          {...props}
+                        />
+                      ),
                     }}
                   >
-                    Stop
-                  </Button>
+                    {normalized}
+                  </ReactMarkdown>
                 </div>
               </div>
-            )}
+            );
+          } else {
+            return (
+              <div
+                key={idx}
+                style={{
+                  ...baseStyle,
+                  float: "left",
+                  textAlign: "left",
+                }}
+              >
+                <Text fontWeight="bold">Agent</Text>
+                <div
+                  style={{
+                    backgroundColor: colors.lightBlue,
+                    color: colors.dark,
+                    ...baseStyle,
+                  }}
+                >
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      ul: (props) => (
+                        <ul
+                          style={{
+                            margin: "0.5rem 0",
+                            paddingLeft: "1.25rem",
+                            listStyleType: "disc",
+                          }}
+                          {...props}
+                        />
+                      ),
+                      ol: (props) => (
+                        <ol
+                          style={{
+                            margin: "0.5rem 0",
+                            paddingLeft: "1.25rem",
+                            listStyleType: "decimal",
+                          }}
+                          {...props}
+                        />
+                      ),
+                      li: (props) => (
+                        <li style={{ margin: "0.15rem 0" }} {...props} />
+                      ),
+                      h3: (props) => (
+                        <h3
+                          style={{
+                            fontWeight: "bold",
+                            fontSize: "1.1rem",
+                          }}
+                          {...props}
+                        />
+                      ),
+                    }}
+                  >
+                    {normalized}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            );
+          }
+        })}
 
-            <div ref={chatEndRef} />
-          </div>
-        </div>
-
-        {/* FOOTER */}
-        <div
-          ref={footerRef}
-          style={{
-            position: "fixed",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: colors.dark,
-            borderTop: `1px solid ${colors.purple}`,
-            padding: "1rem 0",
-            display: "flex",
-            justifyContent: "center",
-            zIndex: 1000,
-          }}
-        >
-          <Textarea
-            ref={textareaRef}
-            borderRadius="25px"
-            padding="1rem 2rem"
-            width="50rem"
-            height="3.5rem"
-            overflow="hidden"
-            color={colors.white}
-            fontWeight={400}
-            borderColor={colors.purple}
-            borderWidth="3px"
-            placeholder="Ask Masuta something about your enterprise architecture..."
-            _placeholder={{ color: "inherit" }}
-            value={userPrompt}
-            resize="none"
-            rows={1}
-            onChange={(e) => setUserPrompt(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                setUserPrompt("");
-                startStream();
-              }
+        {isStreaming && (
+          <div
+            style={{
+              clear: "both",
+              position: "relative",
+              background: colors.lightBlue,
+              color: colors.dark,
+              minHeight: 160,
+              marginTop: "2rem",
+              maxWidth: "80%",
+              marginBottom: "0.5rem",
+              padding: "0.5rem 0.75rem",
+              borderRadius: "12px",
             }}
-          />
-        </div>
+          >
+            {output ? output : <i>Thinking...</i>}
+            <Button
+              onClick={stopStream}
+              disabled={!isStreaming}
+              style={{
+                position: "absolute",
+                bottom: "0.75rem",
+                right: "0.75rem",
+                backgroundColor: colors.lightBlue,
+                color: colors.dark,
+                fontWeight: "bold",
+                padding: "0.2rem 1rem",
+              }}
+            >
+              Stop
+            </Button>
+          </div>
+        )}
       </div>
-    </Provider>
+
+      <div
+        style={{
+          position: "fixed",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: colors.dark,
+          borderTop: "1px solid #eee",
+          padding: "1rem 0",
+          display: "flex",
+          justifyContent: "center",
+          zIndex: 1000,
+          borderColor: colors.purple,
+        }}
+      >
+        <Textarea
+          borderRadius="25px"
+          padding="1rem 2rem"
+          width="50rem"
+          height="3.5rem"
+          overflow="hidden"
+          color={colors.white}
+          fontWeight={400}
+          // border colors purple gradient
+          borderColor={colors.purple}
+          borderWidth="3px"
+          placeholder="Ask Masuta something about your enterprise architecture..."
+          _placeholder={{ color: "inherit" }}
+          value={userPrompt}
+          resize="none"
+          rows={1}
+          onChange={(e) => setUserPrompt(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              setUserPrompt("");
+              startStream();
+            }
+          }}
+        />
+      </div>
+    </>
   );
 }
