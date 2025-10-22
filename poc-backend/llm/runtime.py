@@ -31,7 +31,9 @@ class ModelManager:
         self.vector_index = vector_index
 
         # Device setup
+                # Device setup
         if torch.backends.mps.is_available() and not torch.cuda.is_available():
+            # fp16 sampling on MPS can be numerically unstable; we'll avoid sampling by default.
             dtype = torch.float16
             self.model = AutoModelForCausalLM.from_pretrained(self.model_id, torch_dtype=dtype)
             self.model.to("mps")
@@ -47,10 +49,16 @@ class ModelManager:
             self.model = AutoModelForCausalLM.from_pretrained(self.model_id, torch_dtype=dtype)
             self.device = torch.device("cpu")
 
+        # Ensure eval mode and a valid pad token
+        self.model.eval()
+        if self.tok.pad_token_id is None and self.tok.eos_token_id is not None:
+            self.tok.pad_token = self.tok.eos_token  # safe default for most chat LLMs
+
         # ---- RAG single-flight cache ----
         self._rag_lock = threading.Lock()
         self._rag_last_query: Optional[str] = None
         self._rag_last_result: Optional[str] = None
+
 
 
     # ---------- RAG ----------
@@ -208,11 +216,27 @@ class ModelManager:
     def generate(self, messages: List[Dict], max_new_tokens=512, temperature=0.2, top_p=0.9) -> str:
         prompt = self.apply_template(messages)
         inputs = self.tok(prompt, return_tensors="pt").to(self.device)
+
+        # Guard: sampling can produce NaN/inf probs on fp16/MPS. Default to greedy unless explicitly safe.
+        safe_sample = (
+            (temperature is not None and temperature > 0.0)
+            and (top_p is not None and 0.0 < top_p < 1.0)
+            and (self.device.type != "mps")  # avoid sampling on MPS by default
+        )
+
+        gen_kwargs = dict(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=bool(safe_sample),
+            temperature=(temperature if safe_sample else None),
+            top_p=(top_p if safe_sample else None),
+        )
+
         with torch.no_grad():
-            out = self.model.generate(
-                **inputs, max_new_tokens=max_new_tokens, temperature=temperature, top_p=top_p
-            )
+            out = self.model.generate(**{k: v for k, v in gen_kwargs.items() if v is not None})
+
         return self.tok.decode(out[0], skip_special_tokens=True)
+
 
 
     def stream_generate(
@@ -221,13 +245,25 @@ class ModelManager:
         prompt = self.apply_template(messages)
         inputs = self.tok(prompt, return_tensors="pt").to(self.device)
         streamer = TextIteratorStreamer(self.tok, skip_prompt=True, skip_special_tokens=True)
+
+        safe_sample = (
+            (temperature is not None and temperature > 0.0)
+            and (top_p is not None and 0.0 < top_p < 1.0)
+            and (self.device.type != "mps")
+        )
+
         kwargs = dict(
             **inputs,
             max_new_tokens=max_new_tokens,
-            temperature=temperature,
-            top_p=top_p,
+            do_sample=bool(safe_sample),
+            temperature=(temperature if safe_sample else None),
+            top_p=(top_p if safe_sample else None),
             streamer=streamer,
         )
+
+        # Drop None values so HF doesn't infer sampling from them
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
         thread = threading.Thread(target=self.model.generate, kwargs=kwargs)
         thread.start()
         for chunk in streamer:

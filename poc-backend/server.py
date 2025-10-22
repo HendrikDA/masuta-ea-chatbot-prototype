@@ -65,13 +65,28 @@ class ChatResponse(BaseModel):
     reply: str
 
 # ---------- Helpers ----------
-def ensure_system_and_inject_context(messages: list, ctx: str) -> None:
-    """Make sure the first message is a system message and inject [CONTEXT]."""
-    if not messages or messages[0].get("role") != "system":
-        # insert as first element to guarantee order
-        messages.insert(0, {"role": "system", "content": mm.system_prompt})
-    if ctx:
-        messages[0]["content"] += f"\n\n[CONTEXT]\n{ctx}"
+def build_prompt_messages(messages: list, ctx: str, max_turns: int = 6) -> list:
+    """
+    Build a *fresh* prompt for this turn only:
+    - Do NOT mutate the stored conversation.
+    - Replace the system message with (base system + latest [CONTEXT]) for this turn.
+    - Keep only the last `max_turns` user/assistant pairs for the LLM.
+    """
+    # Base system (never mutated in storage)
+    sys_msg = {
+        "role": "system",
+        "content": mm.system_prompt + (f"\n\n[CONTEXT]\n{ctx}" if ctx else "")
+    }
+
+    # Drop any stored system messages and keep only dialogue turns
+    turns = [m for m in messages if m.get("role") in ("user", "assistant")]
+
+    # Trim to the last N turns (user+assistant pairs -> up to 2*max_turns messages)
+    trimmed = turns[-(max_turns*2):]
+
+    # Return a brand-new list for generation
+    return [sys_msg] + trimmed
+
 
 # ---------- Routes ----------
 @app.get("/healthz")
@@ -90,14 +105,15 @@ def chat(req: ChatRequest):
 
     # RAG once, inject once, log once
     ctx = mm.retrieve_augmentation(req.userMessage)
-    ensure_system_and_inject_context(messages, ctx)
+    prompt_messages = build_prompt_messages(messages, ctx, max_turns=6)
+
     print("🔍 RAG Context:\n", ctx)
-    preview_prompt = mm.apply_template(messages)
+    preview_prompt = mm.apply_template(prompt_messages)
     print("🧠 Full Prompt to LLM:\n", preview_prompt)
 
-    # Generate
+    # Generate using the trimmed, non-mutating prompt
     params = req.params or ChatParams()
-    text = mm.generate(messages, params.max_new_tokens, params.temperature, params.top_p)
+    text = mm.generate(prompt_messages, params.max_new_tokens, params.temperature, params.top_p)
     print("📝 Reply:\n", text)
 
     conv.append(cid, "assistant", text)
@@ -114,19 +130,20 @@ def chat_stream(req: ChatRequest):
 
     # RAG once, inject once, log once
     ctx = mm.retrieve_augmentation(req.userMessage)
-    ensure_system_and_inject_context(messages, ctx)
+    prompt_messages = build_prompt_messages(messages, ctx, max_turns=6)
+
     print("🔍 RAG Context:\n", ctx)
-    preview_prompt = mm.apply_template(messages)
+    preview_prompt = mm.apply_template(prompt_messages)
     print("🧠 Full Prompt to LLM:\n", preview_prompt)
 
     params = req.params or ChatParams()
 
     def sse():
         try:
-            for chunk in mm.stream_generate(messages, params.max_new_tokens, params.temperature, params.top_p):
+            for chunk in mm.stream_generate(prompt_messages, params.max_new_tokens, params.temperature, params.top_p):
                 yield f"data: {chunk}\n\n"
             yield "data: [DONE]\n\n"
         except Exception as e:
-            yield f"event: error\ndata: {str(e)}\n\n"
+            yield f"data: [ERROR] {str(e)}\n\n"
 
     return StreamingResponse(sse(), media_type="text/event-stream")
