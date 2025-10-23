@@ -21,7 +21,7 @@ class ModelManager:
         self.system_prompt = system_prompt or (
             "You are an assistant in the realm of Enterprise Architecture Management (EAM). "
             "Support the user using only the information given in [CONTEXT] when available."
-            "Everything you answer should be in the realm of Enterprise Architecture."
+            "Everything you answer should be in the realm of Enterprise Architecture. Be concise."
         )
         self.tok = AutoTokenizer.from_pretrained(self.model_id, use_fast=True)
 
@@ -135,7 +135,7 @@ class ModelManager:
         LIMIT $k
         """
 
-        params = {"index": self.vector_index, "k": 5, "emb": qvec}
+        params = {"index": self.vector_index, "k": 10, "emb": qvec}
 
         print("\n--- Cypher (parameterized, vector) ---")
         print(cypher_vec.strip())
@@ -156,7 +156,7 @@ class ModelManager:
         # ---------- Fallback: keyword search ----------
         if not rows:
             tokens = [t.strip(".,:;!?()[]\"'") for t in q_raw.lower().split()]
-            tokens = [t for t in tokens if len(t) >= 4]
+            #tokens = [t for t in tokens if len(t) >= 4]
             kw_list = list(dict.fromkeys(tokens))
             print(f"FALLBACK textual search for tokens: {kw_list}")
 
@@ -179,7 +179,7 @@ class ModelManager:
                 } AS n,
                 toFloat(matches) AS score
             ORDER BY score DESC
-            LIMIT 5
+            LIMIT 10
             """
 
             with self.driver.session() as s:
