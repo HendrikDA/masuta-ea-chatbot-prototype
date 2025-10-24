@@ -29,6 +29,10 @@ class ModelManager:
         self.driver = driver
         self.embedder = embedder
         self.vector_index = vector_index
+        
+        # NEW: default to RAG on (frontend can flip it)
+        self.use_rag: bool = True
+
 
         # Device setup
         if torch.backends.mps.is_available() and not torch.cuda.is_available():

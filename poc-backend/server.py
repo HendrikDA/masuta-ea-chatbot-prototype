@@ -120,7 +120,8 @@ def chat(req: ChatRequest):
     conv.append(cid, "user", req.userMessage)
 
     # RAG only on the CURRENT user text
-    ctx = mm.retrieve_augmentation(req.userMessage)
+    use_rag = getattr(mm, "use_rag", True)
+    ctx = mm.retrieve_augmentation(req.userMessage) if use_rag else ""
     prompt_messages = build_current_turn_prompt(req.userMessage, ctx)
 
     print("🔍 RAG Context:\n", ctx)
@@ -150,7 +151,8 @@ def chat_stream(req: ChatRequest):
     conv.append(cid, "user", req.userMessage)
 
     # RAG only on the CURRENT user text
-    ctx = mm.retrieve_augmentation(req.userMessage)
+    use_rag = getattr(mm, "use_rag", True)
+    ctx = mm.retrieve_augmentation(req.userMessage) if use_rag else ""
     prompt_messages = build_current_turn_prompt(req.userMessage, ctx)
 
     print("🔍 RAG Context:\n", ctx)
