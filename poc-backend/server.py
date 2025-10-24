@@ -6,9 +6,14 @@ from pydantic import BaseModel
 from typing import Optional
 from neo4j import GraphDatabase
 from sentence_transformers import SentenceTransformer
+from pydantic import BaseModel
+
 
 from llm.runtime import ModelManager
 from state import conversations as conv
+
+class ToggleRequest(BaseModel):
+    use_rag: bool
 
 # ---------- FastAPI setup ----------
 app = FastAPI(title="EA PoC - Qwen + Neo4j RAG")
@@ -184,3 +189,11 @@ def chat_stream(req: ChatRequest):
     }
 
     return StreamingResponse(sse_wrapper(), media_type="text/event-stream", headers=headers)
+
+
+@app.post("/rag/toggle")
+def toggle_rag(req: ToggleRequest):
+    mm.use_rag = req.use_rag
+    status = "enabled" if req.use_rag else "disabled"
+    print(f"RAG has been {status}.")
+    return {"rag_enabled": mm.use_rag}

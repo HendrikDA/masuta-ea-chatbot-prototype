@@ -5,20 +5,27 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, TextIteratorStream
 MODEL_ID = "Qwen/Qwen2.5-7B-Instruct"   # swap to "Qwen/Qwen2.5-3B-Instruct" if you need lighter
 SYSTEM = "You are an Enterprise Architecture assistant. Be concise."
 
+tok = AutoTokenizer.from_pretrained("openai/gpt-oss-20b")
+model = AutoModelForCausalLM.from_pretrained("openai/gpt-oss-20b")
+
+
 def get_device_map():
     if torch.cuda.is_available(): return "auto"
     if torch.backends.mps.is_available(): return {"": "mps"}
     return "cpu"
 
-def load_model():
-    tok = AutoTokenizer.from_pretrained(MODEL_ID, use_fast=True)
-    dtype = torch.float16 if (torch.cuda.is_available() or torch.backends.mps.is_available()) else torch.float32
-    model = AutoModelForCausalLM.from_pretrained(
-        MODEL_ID,
-        device_map=get_device_map(),
-        torch_dtype=dtype
-    )
-    return tok, model
+# def load_model():
+#     # tok = AutoTokenizer.from_pretrained(MODEL_ID, use_fast=True)
+#     # dtype = torch.float16 if (torch.cuda.is_available() or torch.backends.mps.is_available()) else torch.float32
+
+#     # model = AutoModelForCausalLM.from_pretrained(
+#     #     MODEL_ID,
+#     #     device_map=get_device_map(),
+#     #     torch_dtype=dtype
+#     # )
+    
+
+#     return tok, model
 
 def trim_history(messages, max_turns=8):
     # Keep system + last N user/assistant turns
@@ -28,7 +35,14 @@ def trim_history(messages, max_turns=8):
     return sys_msg + turns[-max_turns*2:]
 
 def make_prompt(tok, messages):
-    return tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    # return tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    return tok.apply_chat_template(
+        messages,
+        add_generation_prompt=True,
+        tokenize=True,
+        return_dict=True,
+        return_tensors="pt",
+    ).to(model.device)
 
 def generate_stream(tok, model, prompt, max_new_tokens=512, temperature=0.2, top_p=0.9):
     inputs = tok(prompt, return_tensors="pt").to(model.device)
@@ -48,7 +62,7 @@ def generate_stream(tok, model, prompt, max_new_tokens=512, temperature=0.2, top
 
 def main():
     print("Loading model…")
-    tok, model = load_model()
+    # tok, model = load_model()
     print("Ready. Type your message. Commands: /reset, /system, /exit\n")
 
     messages = [{"role": "system", "content": SYSTEM}]

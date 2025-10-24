@@ -135,7 +135,7 @@ class ModelManager:
         LIMIT $k
         """
 
-        params = {"index": self.vector_index, "k": 10, "emb": qvec}
+        params = {"index": self.vector_index, "k": 5, "emb": qvec}
 
         print("\n--- Cypher (parameterized, vector) ---")
         print(cypher_vec.strip())
@@ -179,7 +179,7 @@ class ModelManager:
                 } AS n,
                 toFloat(matches) AS score
             ORDER BY score DESC
-            LIMIT 10
+            LIMIT 5
             """
 
             with self.driver.session() as s:
