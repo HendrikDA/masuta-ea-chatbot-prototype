@@ -1,7 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { colors } from "../../utils/colors";
+import { Switch } from "@chakra-ui/react";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 export default function Header() {
+  const [RAGisActive, setRAGisActive] = useState(true);
+
+  const toggleRAG = async (checked) => {
+    try {
+      await fetch("http://localhost:8000/rag/toggle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ use_rag: checked }),
+      });
+    } catch (e: any) {
+      console.log("Error toggling RAG:", e.message);
+    } finally {
+      setRAGisActive(checked);
+    }
+  };
+
   return (
     <header
       style={{
@@ -31,7 +49,27 @@ export default function Header() {
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        <b>Masuta</b> - Your Enterprise Architecture Assistant
+        <b>Masuta 達人</b> - Your Enterprise Architecture Assistant
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          right: "1rem",
+          transform: "translateY(-50%)",
+        }}
+      >
+        <Switch.Root
+          colorPalette="green"
+          checked={RAGisActive}
+          onCheckedChange={({ checked }) => toggleRAG(checked)}
+        >
+          <Switch.HiddenInput />
+          <Switch.Control />
+          <Switch.Label>
+            {RAGisActive ? "RAG is Activated" : "RAG is Deactivated"}
+          </Switch.Label>
+        </Switch.Root>
       </div>
     </header>
   );
