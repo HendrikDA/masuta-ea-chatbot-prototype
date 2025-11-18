@@ -42,6 +42,7 @@ Then, make sure that the embeddings of the graph database are set by running the
 For the server-version run the following (you must activate some Python stuff before running the server)
 
 > source .venv/bin/activate
+
 > uvicorn server:app --host 0.0.0.0 --port 8000 --reload
 
 ## Troubleshooting
