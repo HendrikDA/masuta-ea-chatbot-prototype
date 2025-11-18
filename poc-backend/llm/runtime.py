@@ -2,11 +2,13 @@ import torch, threading
 from typing import List, Dict, Generator, Optional
 from transformers import AutoTokenizer, AutoModelForCausalLM, TextIteratorStreamer
 from neo4j import GraphDatabase
+from openai import OpenAI
 import json
 from textwrap import shorten
 
 
 DEFAULT_MODEL = "Qwen/Qwen2.5-7B-Instruct"
+
 
 class ModelManager:
     def __init__(
@@ -14,7 +16,7 @@ class ModelManager:
         model_id: str = DEFAULT_MODEL,
         system_prompt: Optional[str] = None,
         driver=None,
-        embedder=None,
+        embedder=None,              # kept for compatibility, but we ignore it now
         vector_index: Optional[str] = None,
     ):
         self.model_id = model_id
@@ -27,16 +29,20 @@ class ModelManager:
 
         # RAG dependencies
         self.driver = driver
-        self.embedder = embedder
-        self.vector_index = vector_index
-        
+        self.vector_index = vector_index or "chunkVectorIndex"
+
+        # OpenAI embedding client (same model as in your Neo4j notebooks)
+        # ---------- OpenAI setup ----------
+        OPENAI_API_KEY="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"
+
+        self.emb_client = OpenAI(api_key=OPENAI_API_KEY)
+        self.embedding_model = "text-embedding-3-small"  # 1536 dims
+
         # NEW: default to RAG on (frontend can flip it)
         self.use_rag: bool = True
 
-
         # Device setup
         if torch.backends.mps.is_available() and not torch.cuda.is_available():
-            # fp16 sampling on MPS can be numerically unstable; we'll avoid sampling by default.
             dtype = torch.float16
             self.model = AutoModelForCausalLM.from_pretrained(self.model_id, torch_dtype=dtype)
             self.model.to("mps")
@@ -55,22 +61,32 @@ class ModelManager:
         # Ensure eval mode and a valid pad token
         self.model.eval()
         if self.tok.pad_token_id is None and self.tok.eos_token_id is not None:
-            self.tok.pad_token = self.tok.eos_token  # safe default for most chat LLMs
+            self.tok.pad_token = self.tok.eos_token
 
         # ---- RAG single-flight cache ----
         self._rag_lock = threading.Lock()
-        self._rag_last_query: Optional[str] = None   # stores normalized cache key
+        self._rag_last_query: Optional[str] = None
         self._rag_last_result: Optional[str] = None
 
-
-
     # ---------- RAG ----------
+    def _embed_query(self, text: str):
+        """
+        Embed the query text using OpenAI's text-embedding-3-small,
+        matching the Neo4j Embedding nodes.
+        """
+        resp = self.emb_client.embeddings.create(
+            model=self.embedding_model,
+            input=text,
+        )
+        vec = resp.data[0].embedding
+        return vec
+
     def retrieve_augmentation(self, query: str) -> str:
         """
         Perform retrieval-augmented generation (RAG):
-        - Vector search via vector index
-        - Fallback to keyword search
-        Executes only once per unique (normalized) user query.
+        - Vector search via `chunkVectorIndex` over :Embedding.value
+        - Resolve owning nodes via HAS_EMBEDDING
+        - Fallback: keyword search over a whitelist of labels
         """
 
         q_raw = (query or "").strip()
@@ -78,26 +94,30 @@ class ModelManager:
             print("RAG: empty query -> skip.")
             return ""
 
-        # Normalize for cache key (lowercase + collapse whitespace to single spaces)
+        # Normalize for cache key
         q_key = " ".join(q_raw.lower().split())
 
-        # prevent re-entry / loop for identical (normalized) queries
         with self._rag_lock:
             if self._rag_last_query == q_key and self._rag_last_result is not None:
                 print("RAG: returning cached result for identical query.")
                 return self._rag_last_result
 
         print("Retrieving RAG context...")
-        if not (self.driver and self.embedder and self.vector_index):
-            print("RAG disabled: missing driver/embedder/vector_index")
+        if not (self.driver and self.vector_index and self.emb_client):
+            print("RAG disabled: missing driver/vector_index/embedding client")
             return ""
 
-        # --- Build embedding
-        qvec = self.embedder.encode([q_raw])[0].tolist()
+        # --- Build embedding with OpenAI
+        try:
+            qvec = self._embed_query(q_raw)
+        except Exception as e:
+            print(f"Embedding call failed: {e}")
+            return ""
+
         emb_len = len(qvec)
         print(f"Embedding created. dims={emb_len}  preview={qvec[:8]}...")
 
-        # --- Inspect vector indexes
+        # --- Inspect vector indexes (debug)
         try:
             with self.driver.session() as s:
                 idx_rows = s.run(
@@ -108,29 +128,35 @@ class ModelManager:
                     RETURN name, entityType, state, labelsOrTypes, properties, options
                     """
                 ).data()
-            print("Indexes found (VECTOR/FULLTEXT):")
+            print("Indexes found (VECTOR):")
             for r in idx_rows:
-                print(f"  - name={r['name']} type={r['entityType']} state={r['state']}")
+                print(f"  - name={r['name']} entityType={r['entityType']} state={r['state']}")
                 print(f"    labelsOrTypes={r['labelsOrTypes']} props={r['properties']} options={r.get('options')}")
         except Exception as e:
             print(f"Index introspection failed: {e}")
 
         # --- Vector search query
+        # The vector index is on (:Embedding).value, so queryNodes returns Embedding nodes.
+        # We then resolve the owner via (owner)-[:HAS_EMBEDDING]->(e).
         cypher_vec = """
         CALL db.index.vector.queryNodes($index, $k, $emb)
         YIELD node, score
 
+        // node is :Embedding → find the owner (Chunk / Capability / Application / etc.)
         OPTIONAL MATCH (owner)-[:HAS_EMBEDDING]->(node)
         OPTIONAL MATCH (node)-[:HAS_EMBEDDING]->(owner2)
         WITH coalesce(owner, owner2, node) AS n, score
 
+        // Keep only relevant labels + fields for context
         WITH n, score,
-             [f IN [n.context, n.text, n.name]
+             labels(n) AS labs,
+             [f IN [n.context, n.text, n.name, n.title]
               WHERE f IS NOT NULL AND f <> ''] AS sfields
         WHERE size(sfields) > 0
+          AND any(l IN labs WHERE l IN ['Chunk','Capability','Application','Section','Document'])
 
         RETURN n {
-                .id, .name,
+                .id, .name, .title,
                 context: head(sfields),
                 labels: labels(n)
             } AS n,
@@ -139,7 +165,7 @@ class ModelManager:
         LIMIT $k
         """
 
-        params = {"index": self.vector_index, "k": 5, "emb": qvec}
+        params = {"index": self.vector_index, "k": 15, "emb": qvec}
 
         print("\n--- Cypher (parameterized, vector) ---")
         print(cypher_vec.strip())
@@ -147,7 +173,6 @@ class ModelManager:
         print(f"index={params['index']!r}, k={params['k']}, emb_len={emb_len}")
         print("emb_preview_first_16=", qvec[:16])
 
-        # Execute vector query
         try:
             with self.driver.session() as s:
                 rows = s.run(cypher_vec, **params).data()
@@ -157,17 +182,17 @@ class ModelManager:
 
         print(f"\nVector query returned {len(rows)} rows.")
 
-        # ---------- Fallback: keyword search ----------
+        # ---------- Fallback: keyword search (restricted to relevant labels) ----------
         if not rows:
             tokens = [t.strip(".,:;!?()[]\"'") for t in q_raw.lower().split()]
-            #tokens = [t for t in tokens if len(t) >= 4]
             kw_list = list(dict.fromkeys(tokens))
             print(f"FALLBACK textual search for tokens: {kw_list}")
 
             cypher_kw = """
             MATCH (n)
+            WHERE any(l IN labels(n) WHERE l IN ['Chunk','Capability','Application','Section','Document'])
             WITH n,
-                 [f IN [n.context, n.text, n.name]
+                 [f IN [n.context, n.text, n.name, n.title]
                   WHERE f IS NOT NULL AND f <> ''] AS sfields
             WHERE size(sfields) > 0
             WITH n, sfields,
@@ -177,13 +202,13 @@ class ModelManager:
                  ) AS matches
             WHERE matches > 0
             RETURN n {
-                    .id, .name,
+                    .id, .name, .title,
                     context: head(sfields),
                     labels: labels(n)
                 } AS n,
                 toFloat(matches) AS score
             ORDER BY score DESC
-            LIMIT 5
+            LIMIT 15
             """
 
             with self.driver.session() as s:
@@ -195,13 +220,16 @@ class ModelManager:
             print("No RAG context found after vector + keyword fallback.")
             return ""
 
-        # --- Format results
+        # --- Format results into a compact [CONTEXT] block
         parts = []
         for i, r in enumerate(rows, 1):
             n = r.get("n") or {}
-            name = (n.get("name") or n.get("id") or f"Result {i}").strip()
+            name = (n.get("name") or n.get("title") or n.get("id") or f"Result {i}").strip()
             ctx = (n.get("context") or "").strip().replace("\n", " ")
-            parts.append(f"[{i}] {name}: {ctx}")
+            labels = n.get("labels", [])
+            label_str = ",".join(labels) if labels else ""
+            parts.append(f"[{i}] ({label_str}) {name}: {ctx}")
+
         result = "\n".join(parts)
 
         # Cache result for identical (normalized) query reuse
@@ -211,23 +239,20 @@ class ModelManager:
 
         return result
 
-
     # ---------- Template / Generation ----------
     def apply_template(self, messages: List[Dict]) -> str:
         if not messages or messages[0].get("role") != "system":
             messages = [{"role": "system", "content": self.system_prompt}] + messages
         return self.tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
-
     def generate(self, messages: List[Dict], max_new_tokens=512, temperature=0.2, top_p=0.9) -> str:
         prompt = self.apply_template(messages)
         inputs = self.tok(prompt, return_tensors="pt").to(self.device)
 
-        # Guard: sampling can produce NaN/inf probs on fp16/MPS. Default to greedy unless explicitly safe.
         safe_sample = (
             (temperature is not None and temperature > 0.0)
             and (top_p is not None and 0.0 < top_p < 1.0)
-            and (self.device.type != "mps")  # avoid sampling on MPS by default
+            and (self.device.type != "mps")
         )
 
         gen_kwargs = dict(
@@ -242,8 +267,6 @@ class ModelManager:
             out = self.model.generate(**{k: v for k, v in gen_kwargs.items() if v is not None})
 
         return self.tok.decode(out[0], skip_special_tokens=True)
-
-
 
     def stream_generate(
         self, messages: List[Dict], max_new_tokens=512, temperature=0.2, top_p=0.9
@@ -267,7 +290,6 @@ class ModelManager:
             streamer=streamer,
         )
 
-        # Drop None values so HF doesn't infer sampling from them
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         thread = threading.Thread(target=self.model.generate, kwargs=kwargs)
