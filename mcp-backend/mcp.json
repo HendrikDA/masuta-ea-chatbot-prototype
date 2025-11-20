@@ -1,0 +1,19 @@
+// from here: https://github.com/neo4j/mcp?tab=readme-ov-file
+{
+  "servers": {
+    "neo4j": {
+      "type": "stdio",
+      "command": "neo4j-mcp",
+      "env": {
+        "NEO4J_URI": "neo4j+s://fde218db.databases.neo4j.io", // Required: Neo4j connection URI
+        "NEO4J_USERNAME": "neo4j", // Required: Database username
+        "NEO4J_PASSWORD": "VgkdUn1MfwDO5ad3TdAh2eFzu9Ry0wNjly1QaFpxJK0", // Required: Database password
+        "NEO4J_DATABASE": "neo4j", // Optional: Database name (default: neo4j)
+        "NEO4J_READ_ONLY": "true", // Optional: Disables write tools (default: false)
+        "NEO4J_TELEMETRY": "false", // Optional: Disables telemetry (default: true)
+        "NEO4J_LOG_LEVEL": "info", // Optional: Log level (default: info)
+        "NEO4J_LOG_FORMAT": "text" // Optional: Log format (default: text)
+      }
+    }
+  }
+}
