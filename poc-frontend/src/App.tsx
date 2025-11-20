@@ -17,6 +17,7 @@ export default function App() {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [output, setOutput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const controllerRef = useRef<AbortController | null>(null);
   const bufferRef = useRef<string>("");
@@ -41,42 +42,44 @@ export default function App() {
     setChatHistory((prev) => [...prev, { role: "user", content: userPrompt }]);
 
     try {
-      await fetchEventSource("http://localhost:8000/chat/stream", {
+      const res = await fetch("http://localhost:4000/api/neo4j/query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          conversationId: "1234",
-          userMessage: userPrompt,
-        }),
+        body: JSON.stringify({ prompt: userPrompt }),
         signal: controllerRef.current.signal,
-        onmessage(ev) {
-          if (ev.data === "[DONE]") {
-            controllerRef.current?.abort();
-            setIsStreaming(false);
-
-            const finalReply = bufferRef.current.trim();
-            setChatHistory((prev) => [
-              ...prev,
-              { role: "agent", content: finalReply },
-            ]);
-            bufferRef.current = "";
-            return;
-          }
-          appendTokenToUI(ev.data);
-        },
-        onerror(err) {
-          console.error("Stream error:", err);
-          controllerRef.current?.abort();
-          setIsStreaming(false);
-        },
       });
-    } catch (e: any) {
-      if (e.name !== "AbortError") console.error("Streaming aborted:", e);
-      setIsStreaming(false);
+
+      const data = await res.json();
+
+      if (data.error) {
+        setChatHistory((prev) => [
+          ...prev,
+          { role: "agent", content: `Error: ${data.error}` },
+        ]);
+      } else {
+        // Backend now returns { answer, cypher, rows }
+        const agentText: string =
+          typeof data.answer === "string"
+            ? data.answer
+            : "I could not generate an explanation from the result.";
+
+        setChatHistory((prev) => [
+          ...prev,
+          { role: "agent", content: agentText },
+        ]);
+      }
+    } catch (err: any) {
+      if (err.name !== "AbortError") {
+        setChatHistory((prev) => [
+          ...prev,
+          { role: "agent", content: `API Error: ${err.message}` },
+        ]);
+      }
     } finally {
-      setUserPrompt("");
+      setIsLoading(false);
+      setIsStreaming(false);
     }
-  }, [isStreaming, userPrompt, appendTokenToUI]);
+  }, [userPrompt, isStreaming]);
 
   const stopStream = useCallback(() => {
     controllerRef.current?.abort();
