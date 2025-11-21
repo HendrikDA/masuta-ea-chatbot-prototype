@@ -31,15 +31,25 @@ app.use(express.json());
 // ------------------------------------
 async function nlToCypher(nlPrompt: string, schema: string) {
   const systemPrompt = `
-You are an expert Cypher generator. 
+You are an expert Cypher generator for a Neo4j-based Enterprise Architecture knowledge graph.
+
 You receive:
 1) A natural-language request.
 2) The Neo4j schema.
 
+Very important modeling hints:
+- The main *textual* knowledge is usually stored in nodes with the label :Chunk
+  (e.g. properties like 'text', 'context', 'table_summary', etc.).
+- Higher-level nodes like :Concept often only provide structure, but not the full text.
+- When the user asks about explanations, definitions, or long-form content, you should
+  primarily use :Chunk nodes as the source and optionally traverse from them to other nodes.
+- Only use labels, properties, and relationships that actually exist in the schema input.
+- Do NOT invent labels, relationship types, or properties.
+
 Your task:
 - Write a SINGLE valid Cypher query.
-- MUST use only labels, properties and relationships from the schema. 
-- MUST NOT invent schema elements.
+- Make a best effort to use :Chunk (and its relevant properties) when the question
+  asks about information that would typically come from text.
 - Output ONLY Cypher. No explanations.
 `;
 
@@ -66,7 +76,57 @@ ${schema}
 }
 
 // ------------------------------------
-// Helper: explain result in natural language
+// Helper: refine Cypher as fallback (focus on :Chunk)
+// ------------------------------------
+async function refineCypherForChunks(
+  nlPrompt: string,
+  previousCypher: string,
+  schema: string
+) {
+  const systemPrompt = `
+You are an expert Cypher generator for a Neo4j-based Enterprise Architecture knowledge graph.
+
+The previous Cypher query returned no rows.
+We suspect that it targeted the wrong labels (e.g. :Concept instead of :Chunk).
+
+Hints:
+- The main *textual* knowledge is usually stored in :Chunk nodes (properties like 'text', 'context', 'table_summary').
+- Try to refocus the query so that it searches or joins via :Chunk where appropriate.
+- Only use labels, properties, and relationships that actually exist in the schema.
+- You may reuse parts of the previous query if still valid, but adjust the label/structure.
+
+Your task:
+- Generate a NEW Cypher query that is more likely to return relevant data for the user's request.
+- Output ONLY Cypher. No explanations.
+`;
+
+  const userPrompt = `
+Original natural-language request:
+${nlPrompt}
+
+Previous Cypher (returned 0 rows):
+${previousCypher}
+
+Schema:
+${schema}
+`;
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4.1",
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+  });
+
+  const cypher = completion.choices?.[0]?.message?.content?.trim();
+  if (!cypher) throw new Error("LLM fallback returned no Cypher");
+
+  return cypher;
+}
+
+// ------------------------------------
+// Helper: explain result in natural language (Markdown)
 // ------------------------------------
 async function explainResult(
   userPrompt: string,
@@ -81,11 +141,16 @@ You are given:
 - The resulting rows from the query.
 
 Your task:
-- Provide a concise, helpful explanation in natural language (3–6 sentences).
+- Provide a concise, helpful explanation, usually within 3–6 sentences but it may be more if the request is complex.
 - Speak like an experienced EA explaining the findings to a junior colleague.
+- Do not mention the Cypher, queries, or other technical details unless relevant to the explanation.
 - Refer to concrete numbers or entities from the result when relevant.
 - If the result set is empty, explain that clearly and suggest what might be missing or how to refine the question.
-- Do NOT output Cypher or JSON, only natural language.
+- Respond in GitHub-flavored Markdown.
+- Use formatting where it adds value, e.g.:
+  - Short headings (## Summary, ## Details)
+  - Bullet lists for key points
+  - Fenced code blocks for Cypher or JSON snippets when helpful.
 `;
 
   const userContent = `
@@ -140,21 +205,46 @@ app.post("/api/neo4j/query", async (req, res) => {
     `);
     const schemaText = JSON.stringify(schemaResult, null, 2);
 
-    // 2) Convert NL → Cypher
-    const cypher = await nlToCypher(prompt, schemaText);
+    // 2) Convert NL → initial Cypher
+    let cypher = await nlToCypher(prompt, schemaText);
     console.log("[LLM] Generated Cypher:", cypher);
 
     // 3) Execute Cypher via MCP
-    const rows = await readCypher(cypher);
+    let rows: unknown = await readCypher(cypher);
+
+    // 3a) If no rows, try a fallback focusing on :Chunk
+    if (Array.isArray(rows) && rows.length === 0) {
+      console.log(
+        "[API] No rows returned, trying fallback Cypher focused on :Chunk…"
+      );
+      const fallbackCypher = await refineCypherForChunks(
+        prompt,
+        cypher,
+        schemaText
+      );
+      console.log("[LLM] Fallback Cypher:", fallbackCypher);
+
+      const fallbackRows = await readCypher(fallbackCypher);
+
+      if (Array.isArray(fallbackRows) && fallbackRows.length > 0) {
+        console.log(
+          "[API] Fallback query returned rows, using fallback result."
+        );
+        cypher = fallbackCypher;
+        rows = fallbackRows;
+      } else {
+        console.log("[API] Fallback query also returned no rows.");
+      }
+    }
 
     // 4) Turn result into a natural-language explanation
     const answer = await explainResult(prompt, cypher, rows);
 
     // 5) Send answer (plus debug info) back to frontend
     res.json({
-      answer, // natural-language EA explanation
-      cypher, // optional, for debugging / dev UI
-      rows, // optional, raw data
+      answer, // natural-language EA explanation (Markdown)
+      cypher, // final Cypher used
+      rows, // final rows (may be empty)
     });
   } catch (err: any) {
     console.error("[API] Error in /api/neo4j/query:", err);
