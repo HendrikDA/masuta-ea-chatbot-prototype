@@ -16,7 +16,7 @@ let transport: StdioClientTransport | null = null;
 let client: Client | null = null;
 
 export async function initNeo4jMcp() {
-  if (client) return; // already initialized
+  if (client) return;
 
   transport = new StdioClientTransport({
     command: "neo4j-mcp",

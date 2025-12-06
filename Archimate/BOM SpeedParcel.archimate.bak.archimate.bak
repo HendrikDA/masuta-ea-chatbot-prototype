@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Business Object Model (BOM) - SpeedParcel" id="id-2168af413a5f4be9831b7869e90af6bf" version="5.0.0">
+  <folder name="Strategy" id="id-e246ae6572334b428cb95be8ba8d5cd3" type="strategy"/>
+  <folder name="Business" id="id-5dfc66dd9f524b18b05deb68c377629f" type="business"/>
+  <folder name="Application" id="id-d96d2135ceee4222b679f13a09ec5702" type="application"/>
+  <folder name="Technology &amp; Physical" id="id-d639766f5e324b0f8031cc02f3835688" type="technology"/>
+  <folder name="Motivation" id="id-f2718afc0eb446b5aa97382a1598db60" type="motivation"/>
+  <folder name="Implementation &amp; Migration" id="id-dc52f48fecf34797a2836ce3659fcf54" type="implementation_migration"/>
+  <folder name="Other" id="id-11cb82291d7a49dc9e63190812d20aed" type="other"/>
+  <folder name="Relations" id="id-a1d184f8d8934587934ab8acc50bdc03" type="relations"/>
+  <folder name="Views" id="id-f1ae492b20774a82a7535715e01dc742" type="diagrams">
+    <element xsi:type="archimate:ArchimateDiagramModel" name="Default View" id="id-afbeeea18846442dae23b9cb553d6f2f"/>
+    <element xsi:type="archimate:ArchimateDiagramModel" name="_READ_ME_" id="id-971dd1ac74184885a57ac22ad816dff5">
+      <child xsi:type="archimate:Note" id="id-3a1fd1daa5134b319dcbf24bca2fdc5d" textAlignment="1" fillColor="#f6f6d8">
+        <bounds x="12" y="12" width="685" height="721"/>
+        <content>Properties that follow are used by the &quot;Customizable Report&quot;
+
+There are two types of properties: &quot;model wide&quot; or &quot;view only&quot;. &quot;model wide&quot; properties affect the whole report where &quot;view only&quot; properties impact only the rendering of the view having them set.
+
+
+MODEL WIDE PROPERTIES
+
+Report:Model:Hide:Business
+	Set to &quot;true&quot; to hide the list of business concepts.
+Report:Model:Hide:Application
+	Set to &quot;true&quot; to hide the list of application concepts.
+Report:Model:Hide:Technology&amp;Physical
+	Set to &quot;true&quot; to hide the list of technlology and physical concepts.
+Report:Model:Hide:Motivation
+	Set to &quot;true&quot; to hide the list of motivation extension concepts
+Report:Model:Hide:Implementation&amp;Migration
+	Set to &quot;true&quot; to hide the list of implementation &amp; migration extension concepts.
+Report:Model:Hide:Other
+	Set to &quot;true&quot; to hide the list of connectors and groupings.
+Report:Model:Hide:Relations
+	Set to &quot;true&quot; to hide the list of relations. 
+Report:Model:Hide:Views
+	Set to &quot;true&quot; to hide the list of views.
+Report:Model:Hide:ViewNumbering
+	Set to &quot;true&quot; to hide numbering at the begining of view name (regexp '^[0-9.]* ').
+Report:Model:Cover:Background
+	URL or path to an image used on the cover (595 x 842).
+	If unset a default image is used. Set it to &quot;null&quot; to disable it.
+Report:Model:Header:Background
+	URL or path to an image used on page header (595 x 50).
+	If unset a default image is used. Set it to &quot;null&quot; to disable it.
+
+
+VIEW ONLY PROPERTIES
+
+Report:View:Detailed
+	Set to &quot;true&quot; to show a detailed list of elements.
+Report:View:Hide
+	Set to &quot;true&quot; to hide the view.
+Report:View:Hide:Diagram
+	Set to &quot;true&quot; to hide the diagram.&#xD;
+Report:View:Tag&#xD;
+	Use this property to tag a view (you can use this property multiple time). Tags can then be used to create a report containing only one specific tag. To do this add &quot;#tagname&quot; to the end of the report title (case insensitive). You can make a view visible for all tag using the special tag &quot;all&quot;.</content>
+      </child>
+      <property key="Report:View:Hide" value="true"/>
+      <property key="Report:View:Hide:Diagram" value="(unused. here only to reference it once in global properties list)"/>
+      <property key="Report:View:Detailed" value="(unused. here only to reference it once in global properties list)"/>
+      <property key="Report:Model:Cover:Background" value="(unused. here only to reference it once in global properties list)"/>
+      <property key="Report:Model:Header:Background" value="(unused. here only to reference it once in global properties list)"/>
+      <property key="Report:View:Tag" value="(unused. here only to reference it once in global properties list)"/>
+    </element>
+  </folder>
+  <property key="Report:Model:Hide:Business" value="false"/>
+  <property key="Report:Model:Hide:Application" value="false"/>
+  <property key="Report:Model:Hide:Technology&amp;Physical" value="false"/>
+  <property key="Report:Model:Hide:Motivation" value="false"/>
+  <property key="Report:Model:Hide:Implementation&amp;Migration" value="false"/>
+  <property key="Report:Model:Hide:Other" value="false"/>
+  <property key="Report:Model:Hide:Relations" value="false"/>
+  <property key="Report:Model:Hide:Views" value="false"/>
+  <property key="Report:Model:Hide:ViewNumbering" value="true"/>
+</archimate:model>

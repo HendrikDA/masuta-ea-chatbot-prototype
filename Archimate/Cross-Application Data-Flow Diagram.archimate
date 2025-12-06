@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Cross-App Data-Flow Diagram" id="id-89857f7137c34f42ba35c9aaaa70bce0" version="5.0.0">
+  <folder name="Strategy" id="id-76bd4c90a8d04161ac8f9ea61a65647f" type="strategy"/>
+  <folder name="Business" id="id-32db8af1ba5942b3a82a5a40b2775471" type="business"/>
+  <folder name="Application" id="id-767eaeca59ab434296d99e53eccccc3c" type="application"/>
+  <folder name="Technology &amp; Physical" id="id-6c33d5dd5b8049bb9e727fba869320dc" type="technology"/>
+  <folder name="Motivation" id="id-761bfde54dba446e90cf2a2af547400a" type="motivation"/>
+  <folder name="Implementation &amp; Migration" id="id-ca7c47a18f6d4a8c9bce843c2dfbda29" type="implementation_migration"/>
+  <folder name="Other" id="id-a0af9bf37e3b4972b922493d31c93139" type="other"/>
+  <folder name="Relations" id="id-d6c8a8ededd94f4caab00a144601aca9" type="relations"/>
+  <folder name="Views" id="id-a84a700c0123409dbcb53bc15e28d2b3" type="diagrams">
+    <element xsi:type="archimate:ArchimateDiagramModel" name="Default View" id="id-f9dfbfb42f5f4bf1a9a9e0738e3a0ada"/>
+  </folder>
+</archimate:model>
