@@ -1,0 +1,1084 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.opengroup.org/xsd/archimate/3.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.1/archimate3_Diagram.xsd" identifier="id-89857f7137c34f42ba35c9aaaa70bce0">
+  <name xml:lang="en">Cross-App Data-Flow Diagram</name>
+  <elements>
+    <element identifier="id-e02830ca6eb8473c8e18cc5d6a8cf6cb" xsi:type="DataObject">
+      <name xml:lang="en">Salesforce</name>
+      <properties>
+        <property propertyDefinitionRef="propid-1">
+          <value xml:lang="en">CRM &amp; Sales</value>
+        </property>
+      </properties>
+    </element>
+    <element identifier="id-c0413c078ece4eb8b83c70e2ee3107ba" xsi:type="DataObject">
+      <name xml:lang="en">API Gateway</name>
+      <properties>
+        <property propertyDefinitionRef="propid-1">
+          <value xml:lang="en">CRM &amp; Sales</value>
+        </property>
+      </properties>
+    </element>
+    <element identifier="id-244c0941bfe9431180ef6ae6e257f657" xsi:type="DataObject">
+      <name xml:lang="en">Magento Plugin</name>
+    </element>
+    <element identifier="id-b27918ea83c14491a2c7f065c84178cb" xsi:type="DataObject">
+      <name xml:lang="en">PandP</name>
+    </element>
+    <element identifier="id-c109f5289c81468c9991f693371f8a70" xsi:type="DataObject">
+      <name xml:lang="en">WooDelivery</name>
+    </element>
+    <element identifier="id-702d246e5ff14403a20ca82d72603c10" xsi:type="DataObject">
+      <name xml:lang="en">AssetMan</name>
+    </element>
+    <element identifier="id-4950916d7427474094487a3e4888c34c" xsi:type="DataObject">
+      <name xml:lang="en">Market Data</name>
+    </element>
+    <element identifier="id-ed41892b2cda4d42bddc7d51768bc2f3" xsi:type="DataObject">
+      <name xml:lang="en">Power BI</name>
+    </element>
+    <element identifier="id-6866a5ebe16a4b2e82d94550892dfbea" xsi:type="DataObject">
+      <name xml:lang="en">RabbitMQ</name>
+    </element>
+    <element identifier="id-a045803bb09b4ef8be860179f864869f" xsi:type="DataObject">
+      <name xml:lang="en">Azure Synapse</name>
+    </element>
+    <element identifier="id-ad4775d21db54cfda16e8fc97c9e31e9" xsi:type="DataObject">
+      <name xml:lang="en">GRC</name>
+    </element>
+    <element identifier="id-b3848becb6934106978e3a680b922073" xsi:type="DataObject">
+      <name xml:lang="en">cmdb</name>
+    </element>
+    <element identifier="id-59db1e8883db408ba4a2a1fdcb933e71" xsi:type="DataObject">
+      <name xml:lang="en">Enterprise Architect</name>
+    </element>
+    <element identifier="id-62e68ccc22354df5855160f678010dc6" xsi:type="DataObject">
+      <name xml:lang="en">Workday FI</name>
+    </element>
+    <element identifier="id-83ec111418144fcab8408869ac3af977" xsi:type="DataObject">
+      <name xml:lang="en">Workday HR</name>
+    </element>
+    <element identifier="id-1a6b6b4fa2424c2d9d17cca072bd97f0" xsi:type="DataObject">
+      <name xml:lang="en">StatMan+</name>
+    </element>
+    <element identifier="id-d0c35340fb09424e9bbe118e51124dc2" xsi:type="DataObject">
+      <name xml:lang="en">TrackDB</name>
+    </element>
+    <element identifier="id-d5825f1ac8b94bd6ae4d0a2cb8c36636" xsi:type="DataObject">
+      <name xml:lang="en">CargoWise</name>
+    </element>
+    <element identifier="id-49745531766e44e085bb458b5ee71415" xsi:type="DataObject">
+      <name xml:lang="en">IBM OMS</name>
+    </element>
+    <element identifier="id-21d74ae7f41444e68b27799503c207c2" xsi:type="DataObject">
+      <name xml:lang="en">Jira</name>
+      <properties>
+        <property propertyDefinitionRef="propid-1">
+          <value xml:lang="en">CRM &amp; Sales</value>
+        </property>
+      </properties>
+    </element>
+    <element identifier="id-a95977fd03614e73aff880ba5830e1d4" xsi:type="DataObject">
+      <name xml:lang="en">Confluence</name>
+      <properties>
+        <property propertyDefinitionRef="propid-1">
+          <value xml:lang="en">CRM &amp; Sales</value>
+        </property>
+      </properties>
+    </element>
+    <element identifier="id-506fe7aa7d9f4cc3b99c7a5886634ced" xsi:type="ApplicationService">
+      <name xml:lang="en">CargoWise</name>
+    </element>
+    <element identifier="id-32fbeacc3a2f4c4291f7d5a28adbc841" xsi:type="ApplicationService">
+      <name xml:lang="en">CargoWise (copy)</name>
+    </element>
+    <element identifier="id-b6f8a3891edc475d9353c0ae5a57dc0a" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Confluence</name>
+      <documentation xml:lang="en">Purpose: Confluence is a global collaboration tool where documentation pages can be
+created and collaborated on. As an example, the product and IT documentation is done
+with confluence. Relevant documents are provided to the employees of SpeedParcel
+through confluence.
+
+Business Objects: Documents</documentation>
+    </element>
+    <element identifier="id-eed1df2f7603448aa1445bf91d3290a7" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Jira</name>
+      <documentation xml:lang="en">Purpose: Jira is used as workflow and ticketing management. Tickets can be created,
+assigned to different projects, and their progress tracked in various boards. Within Jira,
+different projects exist for different business units. E.g. customer service might create
+Jira tickets for incoming complaints and reports from customers.
+
+Business Objects: Ticket</documentation>
+    </element>
+    <element identifier="id-e8e8e71c2bdf4765ae0fce5d70e6e4f5" xsi:type="ApplicationComponent">
+      <name xml:lang="en">CargoWise</name>
+      <documentation xml:lang="en">Purpose: Handles global customs clearance and warehouse execution (CargoWise,
+2025). We added this application for Customs Management and Warehouse
+Management replacing CNCustoms and WHAU.
+
+Business Objects: Shipment, CustomsEntry, Parcel</documentation>
+    </element>
+    <element identifier="id-08a4e24a9b0d42c880efb48bf3387033" xsi:type="ApplicationComponent">
+      <name xml:lang="en">IBM OMS</name>
+      <documentation xml:lang="en">Purpose: IBM OMS is an order management system that was already in place at
+SpeedParcel. It is one of the central applications as all orders go through here.
+
+Business Objects: Order, Customer, Warehouse, Sortingcenter</documentation>
+    </element>
+    <element identifier="id-314d5d49db7d4c4ab1461226b2f61a51" xsi:type="ApplicationComponent">
+      <name xml:lang="en">TrackDB</name>
+      <documentation xml:lang="en">Purpose: This is the central tracking database for SpeedParcel, aggregating and
+managing all shipment and parcel tracking events across the logistic network. Providing
+real time visibility into the status and location of shipments.
+
+Business Objects: TrackingEvent, Order, Driver, Route, Network</documentation>
+    </element>
+    <element identifier="id-7a3d69f283ec4da9a490c5dd5011bd2c" xsi:type="ApplicationComponent">
+      <name xml:lang="en">StatMan+</name>
+      <documentation xml:lang="en">Purpose: StatMan+ is a system for assigning domestic shipments to last-mile delivery
+resources. It supports the logistic operations in Transport Management and Sorting
+Center Management.
+
+Business Objects: Shipment, Parcel, Warehouse, Sortingcenter</documentation>
+    </element>
+    <element identifier="id-6e8c7040e9824a8b84ea639b214d7222" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Workday HR</name>
+      <documentation xml:lang="en">Purpose: Workday HR is a tool which enables HR operations and focuses on enabling
+employees and managing talent.
+
+Business Objects: Employee</documentation>
+    </element>
+    <element identifier="id-6893f9c4317542d28c2d2a66ae3606d9" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Workday FI</name>
+      <documentation xml:lang="en">Purpose: Workday FI is a tool which enables SpeedParcel to manage their financial
+reporting and accounting. It is also used to manage and automate all things to do with
+employee compensation. It is able to execute salary transactions, compute taxes, and
+add bonuses in an automated fashion.
+
+Business Objects: Invoice, Employee, Salary, Report</documentation>
+    </element>
+    <element identifier="id-890dc2fc94ba4450848b0c16bb76628b" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Enterprise Architecture</name>
+      <documentation xml:lang="en">Purpose: This application is used to create architecture diagrams like the Business
+Capability Map, Business Application Map and Business Object Diagram and manage all
+applications within SpeedParcel. This application allows the authorized employees to
+make changes in the from us provided diagrams to keep the maps up to date after each
+change. The created documents also serve as an overview that can be used for training
+employees.
+
+Business Objects: Documents</documentation>
+    </element>
+    <element identifier="id-8a2a3efb561b4fdf855cc0a05a2d0baa" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Configuration Management Database (cmdb)</name>
+      <documentation xml:lang="en">Purpose: CMDB is a configuration management database and is used as a central
+database that stores information about all elements and configurations in the IT
+infrastructure. This application remains relevant because it retains settings and supports
+for other IT applications.
+
+Business Objects: Database Configuration</documentation>
+    </element>
+    <element identifier="id-702e961723254dd2b25d7f6a35a37ec6" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Governance, Risk, and Compliance (GRC)</name>
+      <documentation xml:lang="en">Purpose: GRC determines things like which applications are incorporated into the
+enterprise and what kind of data they may process and how this data is protected to fit
+the compliance requirements.
+
+Business Objects: Authorizations, Policy, Report</documentation>
+    </element>
+    <element identifier="id-e55bac8bf1a94332a75778db34d78792" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Azure Synapse</name>
+      <documentation xml:lang="en">Purpose: Azure Synapse is an enterprise data warehouse for consolidated operational
+and analytical data. It is a repository of data that is collected from different sources like
+Workday HR/FI, Jira, CargoWise and IBM OMS and uses them for analysis and reporting.
+
+Business Objects: Employee, Salary, Sortingcenter, Warehouse, Order, Report,
+Customer, Shipment, Driver, Network, Recipient</documentation>
+    </element>
+    <element identifier="id-03cdb4dc95c14054848e160f72c80d3b" xsi:type="ApplicationComponent">
+      <name xml:lang="en">RabbitMQ</name>
+      <documentation xml:lang="en">Purpose: This application is somewhat special within the SpeedParcel landscape
+because it is a message-oriented middleware (MOM) through which all data passes. This
+means that all data flows through this application and thus it technically enables all
+capabilities. In order to not have to connect it with every capability, we have the edges
+out of the landscape map. Again, in order to keep the landscape readable, RabbitMQ is
+left out, as every data flow connection would have to run through it. It is technically in the
+middle between each connection in the diagram.
+
+Business Objects: n/a</documentation>
+    </element>
+    <element identifier="id-e99eb842ea0b4fcbafa1797181f41fe2" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Power BI</name>
+      <documentation xml:lang="en">Purpose: Power BI serves as the central analytics and business intelligence platform for
+SpeedParcel. It aggregates, visualizes, and reports on data from all core operational and
+management systems. Power BI enables data-driven decision-making across multiple
+business domains by transforming raw data into actionable insights. Power BI provides
+dashboards and reports for monitoring KPIs, SLAs, and operational efficiency across the
+organization. It also delivers sales analytics, pipeline tracking, and customer
+segmentation, supporting both strategic and tactical sales decisions. In areas like
+marketing, it can help by analyzing campaign effectiveness, market trends, and
+customer acquisition metrics to inform marketing strategies.
+
+Business Objects: Report, Order, Shipment, Customer, Lead, Route, Network, recipient</documentation>
+    </element>
+    <element identifier="id-efe180976c134e7081d5fa330f1e958a" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Market Data</name>
+      <documentation xml:lang="en">Purpose: Market Data is a specialized application that provides external market
+intelligence and industry benchmarks to SpeedParcel’s marketing teams. It aggregates
+and delivers up-to-date information on market trends, competitor activities, and
+customer demand patterns, supporting informed decision-making in marketing
+management. Market data sends data to Salesforce and Power BI.
+Market Data supports things like marketing management by enabling the marketing team
+to identify emerging trends, assess market opportunities, and benchmark SpeedParcel’s
+performance against industry standards. This supports campaign planning, market
+segmentation, and the development of new service offerings
+
+Business Objects: SegmentOpportunity</documentation>
+    </element>
+    <element identifier="id-29c30261ad81497f989a0831af66da2a" xsi:type="ApplicationComponent">
+      <name xml:lang="en">AssetMan</name>
+      <documentation xml:lang="en">Purpose: Asset management system. Registers and tracks vehicles, buildings and
+handheld scanners and depots; feeds depreciation data to Finance.
+
+Business Objects: Vehicle, Fleet, Facility</documentation>
+    </element>
+    <element identifier="id-e0c3fb0ba1b444b68bcead9bdc07799d" xsi:type="ApplicationComponent">
+      <name xml:lang="en">WooDelivery</name>
+      <documentation xml:lang="en">Purpose: Mobile marketplace app that matches freelance couriers with open deliver
+orders; supports “Uber-like” model. The application WooDelivery will fulfill the
+requirements for Fleet Management, Business Partner Management and most of the
+Route &amp; Network Management. The external drivers can use WooDelivery to find, accept
+and execute an order. (WooDelivery, 2025)
+
+Business Objects: External Partner, Driver, Order, Vehicle, Fleet, Route, Network, Parcel</documentation>
+    </element>
+    <element identifier="id-b34c5b5715f34e3a8b6b2cfad6ec9e07" xsi:type="ApplicationComponent">
+      <name xml:lang="en">PandP</name>
+      <documentation xml:lang="en">Purpose: A system for picking and packing activities, such as retrieving goods from
+storage and preparing them for shipment.
+
+Business Objects: Parcel, Shipment</documentation>
+    </element>
+    <element identifier="id-d084d5b2cd164432b0410a1e78c7e2bb" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Magento Plugin</name>
+      <documentation xml:lang="en">Purpose: This plugin allows a web shop system to cover the generation and printing of
+domestic and X-border shipping labels as well as order fulfillment.
+
+Business Objects: Order, TrackingEvent</documentation>
+    </element>
+    <element identifier="id-192de9a5c7fa40e3badf8a4e7b0eebf4" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Salesforce</name>
+      <documentation xml:lang="en">Purpose: Saleforce is a Customer Relationship Management (CRM) System that
+maintains customer data and supports sales to manage their accounts, customer
+contacts, leads, contracts and quoting.
+
+Business Objects: Leads, Contract, Customer</documentation>
+    </element>
+    <element identifier="id-c134c63e2836486da3cab72899cac381" xsi:type="ApplicationComponent">
+      <name xml:lang="en">API Gateway</name>
+      <documentation xml:lang="en">Purpose: API Gateway provides web services to external partners. It is used by customers
+for providing pre-advices for domestic and x-boarder shipments, tracking information
+and also covers the order fulfillment API. Central entry point that secures and routes all
+external REST calls to SpeedParcel back-end services.
+
+Business Objects: TrackingEvent, Order</documentation>
+    </element>
+  </elements>
+  <relationships>
+    <relationship identifier="id-198db232dc8940ff8cdb171e9a08aa33" source="id-49745531766e44e085bb458b5ee71415" target="id-d5825f1ac8b94bd6ae4d0a2cb8c36636" xsi:type="Aggregation" />
+    <relationship identifier="id-bb117deb10c14e098dfe6b635e338809" source="id-32fbeacc3a2f4c4291f7d5a28adbc841" target="id-506fe7aa7d9f4cc3b99c7a5886634ced" xsi:type="Serving" />
+    <relationship identifier="id-6cf5f1d0bd324207a5c6fb4d9ce0c2bd" source="id-32fbeacc3a2f4c4291f7d5a28adbc841" target="id-506fe7aa7d9f4cc3b99c7a5886634ced" xsi:type="Flow" />
+    <relationship identifier="id-4b1d3e8b565d45faa0745f768e81181c" source="id-b6f8a3891edc475d9353c0ae5a57dc0a" target="id-eed1df2f7603448aa1445bf91d3290a7" xsi:type="Triggering" />
+    <relationship identifier="id-afd5575c9ffe4aeeab21fce4e7b03934" source="id-eed1df2f7603448aa1445bf91d3290a7" target="id-b6f8a3891edc475d9353c0ae5a57dc0a" xsi:type="Flow" />
+    <relationship identifier="id-e9e7071440984befaced34a657bb0c91" source="id-eed1df2f7603448aa1445bf91d3290a7" target="id-b6f8a3891edc475d9353c0ae5a57dc0a" xsi:type="Realization" />
+    <relationship identifier="id-cef6076706524d4f871df4738d3fe0a9" source="id-192de9a5c7fa40e3badf8a4e7b0eebf4" target="id-e99eb842ea0b4fcbafa1797181f41fe2" xsi:type="Serving">
+      <name xml:lang="en">leads</name>
+    </relationship>
+    <relationship identifier="id-6466b1ce596a4c82b1ff16b59e814481" source="id-efe180976c134e7081d5fa330f1e958a" target="id-192de9a5c7fa40e3badf8a4e7b0eebf4" xsi:type="Serving">
+      <name xml:lang="en">segmented opportunities</name>
+    </relationship>
+    <relationship identifier="id-2b1b779e9e0f42e2b9c4222c4b1a9df1" source="id-192de9a5c7fa40e3badf8a4e7b0eebf4" target="id-08a4e24a9b0d42c880efb48bf3387033" xsi:type="Serving">
+      <name xml:lang="en">customer, contract, lead data</name>
+    </relationship>
+    <relationship identifier="id-33195dd4bf0a4215a6598661817d0165" source="id-d084d5b2cd164432b0410a1e78c7e2bb" target="id-c134c63e2836486da3cab72899cac381" xsi:type="Triggering">
+      <name xml:lang="en">transport detail</name>
+    </relationship>
+    <relationship identifier="id-93295e8fb2d54d47b81976c12e3cdfed" source="id-c134c63e2836486da3cab72899cac381" target="id-d084d5b2cd164432b0410a1e78c7e2bb" xsi:type="Triggering">
+      <name xml:lang="en">track event</name>
+    </relationship>
+    <relationship identifier="id-a7d7c8085d074fd6802a044c5725a345" source="id-c134c63e2836486da3cab72899cac381" target="id-08a4e24a9b0d42c880efb48bf3387033" xsi:type="Triggering">
+      <name xml:lang="en">transport detail</name>
+    </relationship>
+    <relationship identifier="id-4b17dea9a92e4d5ab6d0c1f4a6f65b57" source="id-314d5d49db7d4c4ab1461226b2f61a51" target="id-c134c63e2836486da3cab72899cac381" xsi:type="Triggering">
+      <name xml:lang="en">tracking event</name>
+    </relationship>
+    <relationship identifier="id-0313152491424cb4809e2743d1f3f3ce" source="id-eed1df2f7603448aa1445bf91d3290a7" target="id-b6f8a3891edc475d9353c0ae5a57dc0a" xsi:type="Triggering">
+      <name xml:lang="en">documents</name>
+    </relationship>
+    <relationship identifier="id-4f20ab157fd14429b849b1130c54fa7e" source="id-b6f8a3891edc475d9353c0ae5a57dc0a" target="id-eed1df2f7603448aa1445bf91d3290a7" xsi:type="Triggering">
+      <name xml:lang="en">documents</name>
+    </relationship>
+    <relationship identifier="id-646381cc57cb4aefa62b95c59b6fe33d" source="id-890dc2fc94ba4450848b0c16bb76628b" target="id-b6f8a3891edc475d9353c0ae5a57dc0a" xsi:type="Triggering">
+      <name xml:lang="en">business capability map, business application map, business object model</name>
+    </relationship>
+    <relationship identifier="id-cb6cc9cb959c4421a9b63e2a4adac59c" source="id-eed1df2f7603448aa1445bf91d3290a7" target="id-6e8c7040e9824a8b84ea639b214d7222" xsi:type="Triggering">
+      <name xml:lang="en">tickets</name>
+    </relationship>
+    <relationship identifier="id-c3ad97339b9e4dcab4637839b0b73f82" source="id-6e8c7040e9824a8b84ea639b214d7222" target="id-eed1df2f7603448aa1445bf91d3290a7" xsi:type="Triggering">
+      <name xml:lang="en">tickets</name>
+    </relationship>
+    <relationship identifier="id-85a39f24e5474c8a97b1c286151b0afa" source="id-314d5d49db7d4c4ab1461226b2f61a51" target="id-e99eb842ea0b4fcbafa1797181f41fe2" xsi:type="Triggering">
+      <name xml:lang="en">tracking event</name>
+    </relationship>
+    <relationship identifier="id-cef2c781170d4bd4a464d517391fb47f" source="id-314d5d49db7d4c4ab1461226b2f61a51" target="id-e8e8e71c2bdf4765ae0fce5d70e6e4f5" xsi:type="Triggering">
+      <name xml:lang="en">international tracking data</name>
+    </relationship>
+    <relationship identifier="id-1e0c7825124c459da2da5b3d4ae4ad5a" source="id-7a3d69f283ec4da9a490c5dd5011bd2c" target="id-e8e8e71c2bdf4765ae0fce5d70e6e4f5" xsi:type="Triggering">
+      <name xml:lang="en">shipment and customs entries</name>
+    </relationship>
+    <relationship identifier="id-850accbdec3c410b8ce23c7edc6e5989" source="id-7a3d69f283ec4da9a490c5dd5011bd2c" target="id-b34c5b5715f34e3a8b6b2cfad6ec9e07" xsi:type="Triggering">
+      <name xml:lang="en">package data</name>
+    </relationship>
+    <relationship identifier="id-5bbf0aeff2f3450db600f327856811c1" source="id-b34c5b5715f34e3a8b6b2cfad6ec9e07" target="id-7a3d69f283ec4da9a490c5dd5011bd2c" xsi:type="Triggering">
+      <name xml:lang="en">package data</name>
+    </relationship>
+    <relationship identifier="id-d83196aafe8b487c9dd423b5ef704254" source="id-d084d5b2cd164432b0410a1e78c7e2bb" target="id-b34c5b5715f34e3a8b6b2cfad6ec9e07" xsi:type="Triggering">
+      <name xml:lang="en">order data</name>
+    </relationship>
+    <relationship identifier="id-d5042bf97b8d47bcafb7df30587b019d" source="id-e8e8e71c2bdf4765ae0fce5d70e6e4f5" target="id-b34c5b5715f34e3a8b6b2cfad6ec9e07" xsi:type="Triggering">
+      <name xml:lang="en">warehouse and order picking data</name>
+    </relationship>
+    <relationship identifier="id-a3dacfad125a472a8871fdd1e75d351c" source="id-08a4e24a9b0d42c880efb48bf3387033" target="id-e0c3fb0ba1b444b68bcead9bdc07799d" xsi:type="Triggering">
+      <name xml:lang="en">order data</name>
+    </relationship>
+    <relationship identifier="id-761ced2fbdf24e0aa8d1ea931a215ea3" source="id-29c30261ad81497f989a0831af66da2a" target="id-e0c3fb0ba1b444b68bcead9bdc07799d" xsi:type="Triggering">
+      <name xml:lang="en">fleet data</name>
+    </relationship>
+    <relationship identifier="id-306d24f5874d473eb38405f92b52d4c8" source="id-29c30261ad81497f989a0831af66da2a" target="id-6893f9c4317542d28c2d2a66ae3606d9" xsi:type="Triggering">
+      <name xml:lang="en">acquisition information, depreciation data, cost center assignment</name>
+    </relationship>
+    <relationship identifier="id-db16a06beac146259c73665aba5d53df" source="id-e99eb842ea0b4fcbafa1797181f41fe2" target="id-e0c3fb0ba1b444b68bcead9bdc07799d" xsi:type="Triggering">
+      <name xml:lang="en">reports</name>
+    </relationship>
+    <relationship identifier="id-5044870f27274033ba2d380abb74ca31" source="id-e0c3fb0ba1b444b68bcead9bdc07799d" target="id-e99eb842ea0b4fcbafa1797181f41fe2" xsi:type="Triggering">
+      <name xml:lang="en">reports</name>
+    </relationship>
+    <relationship identifier="id-e5b662ad2d334b45855d730e76442443" source="id-e8e8e71c2bdf4765ae0fce5d70e6e4f5" target="id-e99eb842ea0b4fcbafa1797181f41fe2" xsi:type="Triggering">
+      <name xml:lang="en">tracking event, inventory item</name>
+    </relationship>
+    <relationship identifier="id-f70a08d696e14abda46d39e1889ba25d" source="id-08a4e24a9b0d42c880efb48bf3387033" target="id-e55bac8bf1a94332a75778db34d78792" xsi:type="Triggering">
+      <name xml:lang="en">order data</name>
+    </relationship>
+    <relationship identifier="id-a51a9f4748474ae5900d41858ef6e450" source="id-08a4e24a9b0d42c880efb48bf3387033" target="id-6893f9c4317542d28c2d2a66ae3606d9" xsi:type="Triggering">
+      <name xml:lang="en">payment and invoice</name>
+    </relationship>
+    <relationship identifier="id-818a4f3bc7e449fa8f74773da7e56b9c" source="id-702e961723254dd2b25d7f6a35a37ec6" target="id-08a4e24a9b0d42c880efb48bf3387033" xsi:type="Triggering">
+      <name xml:lang="en">authorizations</name>
+    </relationship>
+    <relationship identifier="id-0c61b13e4fac4b70b6a423c5c74dc4b3" source="id-08a4e24a9b0d42c880efb48bf3387033" target="id-702e961723254dd2b25d7f6a35a37ec6" xsi:type="Triggering">
+      <name xml:lang="en">authorizations</name>
+    </relationship>
+    <relationship identifier="id-c4dafcfd26ca49f8941dec7f8a249241" source="id-e8e8e71c2bdf4765ae0fce5d70e6e4f5" target="id-e55bac8bf1a94332a75778db34d78792" xsi:type="Triggering">
+      <name xml:lang="en">warehouse data</name>
+    </relationship>
+    <relationship identifier="id-e781cea6d1774b7cb3a79f293cbc74e9" source="id-e8e8e71c2bdf4765ae0fce5d70e6e4f5" target="id-702e961723254dd2b25d7f6a35a37ec6" xsi:type="Triggering">
+      <name xml:lang="en">laws and regulations</name>
+    </relationship>
+    <relationship identifier="id-1261bf4e56fc49629a5c62767f467d2b" source="id-e55bac8bf1a94332a75778db34d78792" target="id-702e961723254dd2b25d7f6a35a37ec6" xsi:type="Triggering">
+      <name xml:lang="en">authorizations</name>
+    </relationship>
+    <relationship identifier="id-9f7e37d4f12c40b1a8eb4d85f25ade6c" source="id-702e961723254dd2b25d7f6a35a37ec6" target="id-e55bac8bf1a94332a75778db34d78792" xsi:type="Triggering">
+      <name xml:lang="en">authorizations</name>
+    </relationship>
+    <relationship identifier="id-25d91001477f40d9b0b04d1ade408151" source="id-702e961723254dd2b25d7f6a35a37ec6" target="id-6893f9c4317542d28c2d2a66ae3606d9" xsi:type="Triggering">
+      <name xml:lang="en">financial transactions, authorizations</name>
+    </relationship>
+    <relationship identifier="id-b8ce7e6c498644e59ecc2e51e2cf09c2" source="id-702e961723254dd2b25d7f6a35a37ec6" target="id-6e8c7040e9824a8b84ea639b214d7222" xsi:type="Triggering">
+      <name xml:lang="en">authorizations</name>
+    </relationship>
+    <relationship identifier="id-c3f93156de194c0092ef3ad2abc42961" source="id-6e8c7040e9824a8b84ea639b214d7222" target="id-702e961723254dd2b25d7f6a35a37ec6" xsi:type="Triggering">
+      <name xml:lang="en">authorizations</name>
+    </relationship>
+    <relationship identifier="id-16f96c9684de4641a05352eaa5d41992" source="id-6893f9c4317542d28c2d2a66ae3606d9" target="id-702e961723254dd2b25d7f6a35a37ec6" xsi:type="Triggering">
+      <name xml:lang="en">financial transactions, authorizations</name>
+    </relationship>
+    <relationship identifier="id-2b7858428a8540878727001522c81eca" source="id-6e8c7040e9824a8b84ea639b214d7222" target="id-6893f9c4317542d28c2d2a66ae3606d9" xsi:type="Triggering">
+      <name xml:lang="en">personal budget, cost center information, wages</name>
+    </relationship>
+    <relationship identifier="id-d93d6346636347df9b18e8014b4179d0" source="id-6893f9c4317542d28c2d2a66ae3606d9" target="id-6e8c7040e9824a8b84ea639b214d7222" xsi:type="Triggering">
+      <name xml:lang="en">personal budget, cost center information, wages</name>
+    </relationship>
+    <relationship identifier="id-0e986f1917d8459cb66ad0a6d00608d4" source="id-8a2a3efb561b4fdf855cc0a05a2d0baa" target="id-e55bac8bf1a94332a75778db34d78792" xsi:type="Triggering">
+      <name xml:lang="en">database configurations</name>
+    </relationship>
+    <relationship identifier="id-931f475a4fed4b6aaa1d3ad9836cb756" source="id-e55bac8bf1a94332a75778db34d78792" target="id-8a2a3efb561b4fdf855cc0a05a2d0baa" xsi:type="Triggering">
+      <name xml:lang="en">database configurations</name>
+    </relationship>
+    <relationship identifier="id-3f9944e7e7104be9a93cd9e56e54355d" source="id-e55bac8bf1a94332a75778db34d78792" target="id-e99eb842ea0b4fcbafa1797181f41fe2" xsi:type="Triggering">
+      <name xml:lang="en">aggregated warehouse and order data</name>
+    </relationship>
+    <relationship identifier="id-03e18c6f56d548c6aef9fd0ca70f7d9a" source="id-b6f8a3891edc475d9353c0ae5a57dc0a" target="id-890dc2fc94ba4450848b0c16bb76628b" xsi:type="Triggering">
+      <name xml:lang="en">business capability map, business application map, business object model</name>
+    </relationship>
+    <relationship identifier="id-e71182c0a86c4d379c824628b1834623" source="id-e8e8e71c2bdf4765ae0fce5d70e6e4f5" target="id-08a4e24a9b0d42c880efb48bf3387033" xsi:type="Triggering">
+      <name xml:lang="en">inventory status</name>
+    </relationship>
+  </relationships>
+  <organizations>
+    <item>
+      <label xml:lang="en">Application</label>
+      <item identifierRef="id-e02830ca6eb8473c8e18cc5d6a8cf6cb" />
+      <item identifierRef="id-c0413c078ece4eb8b83c70e2ee3107ba" />
+      <item identifierRef="id-244c0941bfe9431180ef6ae6e257f657" />
+      <item identifierRef="id-b27918ea83c14491a2c7f065c84178cb" />
+      <item identifierRef="id-c109f5289c81468c9991f693371f8a70" />
+      <item identifierRef="id-702d246e5ff14403a20ca82d72603c10" />
+      <item identifierRef="id-4950916d7427474094487a3e4888c34c" />
+      <item identifierRef="id-ed41892b2cda4d42bddc7d51768bc2f3" />
+      <item identifierRef="id-6866a5ebe16a4b2e82d94550892dfbea" />
+      <item identifierRef="id-a045803bb09b4ef8be860179f864869f" />
+      <item identifierRef="id-ad4775d21db54cfda16e8fc97c9e31e9" />
+      <item identifierRef="id-b3848becb6934106978e3a680b922073" />
+      <item identifierRef="id-59db1e8883db408ba4a2a1fdcb933e71" />
+      <item identifierRef="id-62e68ccc22354df5855160f678010dc6" />
+      <item identifierRef="id-83ec111418144fcab8408869ac3af977" />
+      <item identifierRef="id-1a6b6b4fa2424c2d9d17cca072bd97f0" />
+      <item identifierRef="id-d0c35340fb09424e9bbe118e51124dc2" />
+      <item identifierRef="id-d5825f1ac8b94bd6ae4d0a2cb8c36636" />
+      <item identifierRef="id-49745531766e44e085bb458b5ee71415" />
+      <item identifierRef="id-21d74ae7f41444e68b27799503c207c2" />
+      <item identifierRef="id-a95977fd03614e73aff880ba5830e1d4" />
+      <item identifierRef="id-506fe7aa7d9f4cc3b99c7a5886634ced" />
+      <item identifierRef="id-32fbeacc3a2f4c4291f7d5a28adbc841" />
+      <item identifierRef="id-b6f8a3891edc475d9353c0ae5a57dc0a" />
+      <item identifierRef="id-eed1df2f7603448aa1445bf91d3290a7" />
+      <item identifierRef="id-e8e8e71c2bdf4765ae0fce5d70e6e4f5" />
+      <item identifierRef="id-08a4e24a9b0d42c880efb48bf3387033" />
+      <item identifierRef="id-314d5d49db7d4c4ab1461226b2f61a51" />
+      <item identifierRef="id-7a3d69f283ec4da9a490c5dd5011bd2c" />
+      <item identifierRef="id-6e8c7040e9824a8b84ea639b214d7222" />
+      <item identifierRef="id-6893f9c4317542d28c2d2a66ae3606d9" />
+      <item identifierRef="id-890dc2fc94ba4450848b0c16bb76628b" />
+      <item identifierRef="id-8a2a3efb561b4fdf855cc0a05a2d0baa" />
+      <item identifierRef="id-702e961723254dd2b25d7f6a35a37ec6" />
+      <item identifierRef="id-e55bac8bf1a94332a75778db34d78792" />
+      <item identifierRef="id-03cdb4dc95c14054848e160f72c80d3b" />
+      <item identifierRef="id-e99eb842ea0b4fcbafa1797181f41fe2" />
+      <item identifierRef="id-efe180976c134e7081d5fa330f1e958a" />
+      <item identifierRef="id-29c30261ad81497f989a0831af66da2a" />
+      <item identifierRef="id-e0c3fb0ba1b444b68bcead9bdc07799d" />
+      <item identifierRef="id-b34c5b5715f34e3a8b6b2cfad6ec9e07" />
+      <item identifierRef="id-d084d5b2cd164432b0410a1e78c7e2bb" />
+      <item identifierRef="id-192de9a5c7fa40e3badf8a4e7b0eebf4" />
+      <item identifierRef="id-c134c63e2836486da3cab72899cac381" />
+    </item>
+    <item>
+      <label xml:lang="en">Relations</label>
+      <item identifierRef="id-198db232dc8940ff8cdb171e9a08aa33" />
+      <item identifierRef="id-bb117deb10c14e098dfe6b635e338809" />
+      <item identifierRef="id-6cf5f1d0bd324207a5c6fb4d9ce0c2bd" />
+      <item identifierRef="id-4b1d3e8b565d45faa0745f768e81181c" />
+      <item identifierRef="id-afd5575c9ffe4aeeab21fce4e7b03934" />
+      <item identifierRef="id-e9e7071440984befaced34a657bb0c91" />
+      <item identifierRef="id-cef6076706524d4f871df4738d3fe0a9" />
+      <item identifierRef="id-6466b1ce596a4c82b1ff16b59e814481" />
+      <item identifierRef="id-2b1b779e9e0f42e2b9c4222c4b1a9df1" />
+      <item identifierRef="id-33195dd4bf0a4215a6598661817d0165" />
+      <item identifierRef="id-93295e8fb2d54d47b81976c12e3cdfed" />
+      <item identifierRef="id-a7d7c8085d074fd6802a044c5725a345" />
+      <item identifierRef="id-4b17dea9a92e4d5ab6d0c1f4a6f65b57" />
+      <item identifierRef="id-0313152491424cb4809e2743d1f3f3ce" />
+      <item identifierRef="id-4f20ab157fd14429b849b1130c54fa7e" />
+      <item identifierRef="id-646381cc57cb4aefa62b95c59b6fe33d" />
+      <item identifierRef="id-cb6cc9cb959c4421a9b63e2a4adac59c" />
+      <item identifierRef="id-c3ad97339b9e4dcab4637839b0b73f82" />
+      <item identifierRef="id-85a39f24e5474c8a97b1c286151b0afa" />
+      <item identifierRef="id-cef2c781170d4bd4a464d517391fb47f" />
+      <item identifierRef="id-1e0c7825124c459da2da5b3d4ae4ad5a" />
+      <item identifierRef="id-850accbdec3c410b8ce23c7edc6e5989" />
+      <item identifierRef="id-5bbf0aeff2f3450db600f327856811c1" />
+      <item identifierRef="id-d83196aafe8b487c9dd423b5ef704254" />
+      <item identifierRef="id-d5042bf97b8d47bcafb7df30587b019d" />
+      <item identifierRef="id-a3dacfad125a472a8871fdd1e75d351c" />
+      <item identifierRef="id-761ced2fbdf24e0aa8d1ea931a215ea3" />
+      <item identifierRef="id-306d24f5874d473eb38405f92b52d4c8" />
+      <item identifierRef="id-db16a06beac146259c73665aba5d53df" />
+      <item identifierRef="id-5044870f27274033ba2d380abb74ca31" />
+      <item identifierRef="id-e5b662ad2d334b45855d730e76442443" />
+      <item identifierRef="id-f70a08d696e14abda46d39e1889ba25d" />
+      <item identifierRef="id-a51a9f4748474ae5900d41858ef6e450" />
+      <item identifierRef="id-818a4f3bc7e449fa8f74773da7e56b9c" />
+      <item identifierRef="id-0c61b13e4fac4b70b6a423c5c74dc4b3" />
+      <item identifierRef="id-c4dafcfd26ca49f8941dec7f8a249241" />
+      <item identifierRef="id-e781cea6d1774b7cb3a79f293cbc74e9" />
+      <item identifierRef="id-1261bf4e56fc49629a5c62767f467d2b" />
+      <item identifierRef="id-9f7e37d4f12c40b1a8eb4d85f25ade6c" />
+      <item identifierRef="id-25d91001477f40d9b0b04d1ade408151" />
+      <item identifierRef="id-b8ce7e6c498644e59ecc2e51e2cf09c2" />
+      <item identifierRef="id-c3f93156de194c0092ef3ad2abc42961" />
+      <item identifierRef="id-16f96c9684de4641a05352eaa5d41992" />
+      <item identifierRef="id-2b7858428a8540878727001522c81eca" />
+      <item identifierRef="id-d93d6346636347df9b18e8014b4179d0" />
+      <item identifierRef="id-0e986f1917d8459cb66ad0a6d00608d4" />
+      <item identifierRef="id-931f475a4fed4b6aaa1d3ad9836cb756" />
+      <item identifierRef="id-3f9944e7e7104be9a93cd9e56e54355d" />
+      <item identifierRef="id-03e18c6f56d548c6aef9fd0ca70f7d9a" />
+      <item identifierRef="id-e71182c0a86c4d379c824628b1834623" />
+    </item>
+    <item>
+      <label xml:lang="en">Views</label>
+      <item identifierRef="id-f9dfbfb42f5f4bf1a9a9e0738e3a0ada" />
+    </item>
+  </organizations>
+  <propertyDefinitions>
+    <propertyDefinition identifier="propid-1" type="string">
+      <name>Category</name>
+    </propertyDefinition>
+  </propertyDefinitions>
+  <views>
+    <diagrams>
+      <view identifier="id-f9dfbfb42f5f4bf1a9a9e0738e3a0ada" xsi:type="Diagram">
+        <name xml:lang="en">Default View</name>
+        <node identifier="id-beb0c0194e7c4f0bb8dc9e837d0eaac0" elementRef="id-b6f8a3891edc475d9353c0ae5a57dc0a" xsi:type="Element" x="2112" y="219" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-c0f041955ab3400ca9acf1b18b60e45e" elementRef="id-eed1df2f7603448aa1445bf91d3290a7" xsi:type="Element" x="1704" y="219" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-a9938b8ede1144419b4f6cfe7f2ea6ed" elementRef="id-e8e8e71c2bdf4765ae0fce5d70e6e4f5" xsi:type="Element" x="1788" y="432" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-3c9d6c5c65db4f1a9e9a07956af963e0" elementRef="id-08a4e24a9b0d42c880efb48bf3387033" xsi:type="Element" x="1464" y="480" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-59c210157f954ee6ad9d95da82e8f102" elementRef="id-314d5d49db7d4c4ab1461226b2f61a51" xsi:type="Element" x="2256" y="390" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-f47c7f516014447391393ab40d71dd4b" elementRef="id-7a3d69f283ec4da9a490c5dd5011bd2c" xsi:type="Element" x="2388" y="552" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-09d658c5f23a43588e541d85b01a4507" elementRef="id-6e8c7040e9824a8b84ea639b214d7222" xsi:type="Element" x="2676" y="876" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-87d07771c7be4ed79b2b2c5f48df4d4b" elementRef="id-6893f9c4317542d28c2d2a66ae3606d9" xsi:type="Element" x="2472" y="1062" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-389cf7a4479848779e20e5ca5d18a55a" elementRef="id-890dc2fc94ba4450848b0c16bb76628b" xsi:type="Element" x="2232" y="931" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-ca3dfd28816b4460bc534957dfff9cee" elementRef="id-8a2a3efb561b4fdf855cc0a05a2d0baa" xsi:type="Element" x="1932" y="876" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-7a6feab43e214a5991ca5f505f6aaab3" elementRef="id-702e961723254dd2b25d7f6a35a37ec6" xsi:type="Element" x="1776" y="972" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-6413c4c39dcd419788b7272f417ce4e7" elementRef="id-e55bac8bf1a94332a75778db34d78792" xsi:type="Element" x="1440" y="894" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-b4ca1e48231740f9a0ba1fb0a1f0a627" elementRef="id-03cdb4dc95c14054848e160f72c80d3b" xsi:type="Element" x="1176" y="1188" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-85e1fbc5288340de999949a19223ae09" elementRef="id-e99eb842ea0b4fcbafa1797181f41fe2" xsi:type="Element" x="960" y="996" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-ad2316f0a31644e8910830ee333450d8" elementRef="id-efe180976c134e7081d5fa330f1e958a" xsi:type="Element" x="684" y="996" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-ce6c52bb3a6040089b043efa54838898" elementRef="id-29c30261ad81497f989a0831af66da2a" xsi:type="Element" x="312" y="1086" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-b5eba7fde22c45b1b2b7f70110a4ba61" elementRef="id-e0c3fb0ba1b444b68bcead9bdc07799d" xsi:type="Element" x="312" y="624" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-ed3138021db24b10bb006a9737762841" elementRef="id-b34c5b5715f34e3a8b6b2cfad6ec9e07" xsi:type="Element" x="933" y="732" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-e73587ac131448c08ad4d38399905fe8" elementRef="id-d084d5b2cd164432b0410a1e78c7e2bb" xsi:type="Element" x="720" y="216" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-ab09947f90b34723ac3bd16a1810d880" elementRef="id-192de9a5c7fa40e3badf8a4e7b0eebf4" xsi:type="Element" x="480" y="390" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-746abda889e2448f86036111b698d332" elementRef="id-c134c63e2836486da3cab72899cac381" xsi:type="Element" x="1128" y="219" w="196" h="91">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <connection identifier="id-9a725a5723984a0f9246c4b11d5939b6" relationshipRef="id-4f20ab157fd14429b849b1130c54fa7e" xsi:type="Relationship" source="id-beb0c0194e7c4f0bb8dc9e837d0eaac0" target="id-c0f041955ab3400ca9acf1b18b60e45e">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-87e4ca9145ff476faa82601195f77058" relationshipRef="id-03e18c6f56d548c6aef9fd0ca70f7d9a" xsi:type="Relationship" source="id-beb0c0194e7c4f0bb8dc9e837d0eaac0" target="id-389cf7a4479848779e20e5ca5d18a55a">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-b855cfe16b604b04a9caad609ef18ae3" relationshipRef="id-0313152491424cb4809e2743d1f3f3ce" xsi:type="Relationship" source="id-c0f041955ab3400ca9acf1b18b60e45e" target="id-beb0c0194e7c4f0bb8dc9e837d0eaac0">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-338e5bdda9964e56b5fdfc74194435b5" relationshipRef="id-cb6cc9cb959c4421a9b63e2a4adac59c" xsi:type="Relationship" source="id-c0f041955ab3400ca9acf1b18b60e45e" target="id-09d658c5f23a43588e541d85b01a4507">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-a9e199e8b9944560bacae456ddf02877" relationshipRef="id-d5042bf97b8d47bcafb7df30587b019d" xsi:type="Relationship" source="id-a9938b8ede1144419b4f6cfe7f2ea6ed" target="id-ed3138021db24b10bb006a9737762841">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-cb9bd668912144b0bd085c7bcb1bbf9d" relationshipRef="id-e5b662ad2d334b45855d730e76442443" xsi:type="Relationship" source="id-a9938b8ede1144419b4f6cfe7f2ea6ed" target="id-85e1fbc5288340de999949a19223ae09">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-cdd30e5541464525b0967c2be4468bee" relationshipRef="id-c4dafcfd26ca49f8941dec7f8a249241" xsi:type="Relationship" source="id-a9938b8ede1144419b4f6cfe7f2ea6ed" target="id-6413c4c39dcd419788b7272f417ce4e7">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-6634e5c7209e45b1a6946165b34461d2" relationshipRef="id-e781cea6d1774b7cb3a79f293cbc74e9" xsi:type="Relationship" source="id-a9938b8ede1144419b4f6cfe7f2ea6ed" target="id-7a6feab43e214a5991ca5f505f6aaab3">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-0fb58ce011df4f5fa7c67fd184b90a06" relationshipRef="id-e71182c0a86c4d379c824628b1834623" xsi:type="Relationship" source="id-a9938b8ede1144419b4f6cfe7f2ea6ed" target="id-3c9d6c5c65db4f1a9e9a07956af963e0">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-881f0971e4dc4999825cd94e0cbabe4f" relationshipRef="id-a3dacfad125a472a8871fdd1e75d351c" xsi:type="Relationship" source="id-3c9d6c5c65db4f1a9e9a07956af963e0" target="id-b5eba7fde22c45b1b2b7f70110a4ba61">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-a454c1bfee43418c9900db4781c7be42" relationshipRef="id-f70a08d696e14abda46d39e1889ba25d" xsi:type="Relationship" source="id-3c9d6c5c65db4f1a9e9a07956af963e0" target="id-6413c4c39dcd419788b7272f417ce4e7">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-b757968cbe19482eb37df8bcffc383ca" relationshipRef="id-a51a9f4748474ae5900d41858ef6e450" xsi:type="Relationship" source="id-3c9d6c5c65db4f1a9e9a07956af963e0" target="id-87d07771c7be4ed79b2b2c5f48df4d4b">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-c75a4a216e9e4582a70d4ec3f422849e" relationshipRef="id-0c61b13e4fac4b70b6a423c5c74dc4b3" xsi:type="Relationship" source="id-3c9d6c5c65db4f1a9e9a07956af963e0" target="id-7a6feab43e214a5991ca5f505f6aaab3">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-1fecc0dac27c44cba61ba4b629b2aca1" relationshipRef="id-4b17dea9a92e4d5ab6d0c1f4a6f65b57" xsi:type="Relationship" source="id-59c210157f954ee6ad9d95da82e8f102" target="id-746abda889e2448f86036111b698d332">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-827d902ac1fc4f45a619e9c3197ffc91" relationshipRef="id-85a39f24e5474c8a97b1c286151b0afa" xsi:type="Relationship" source="id-59c210157f954ee6ad9d95da82e8f102" target="id-85e1fbc5288340de999949a19223ae09">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-1dbb4ee4d5344308aed89ae9887748a0" relationshipRef="id-cef2c781170d4bd4a464d517391fb47f" xsi:type="Relationship" source="id-59c210157f954ee6ad9d95da82e8f102" target="id-a9938b8ede1144419b4f6cfe7f2ea6ed">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-1a12fcf4e8da4a03bfa4c6155543417f" relationshipRef="id-1e0c7825124c459da2da5b3d4ae4ad5a" xsi:type="Relationship" source="id-f47c7f516014447391393ab40d71dd4b" target="id-a9938b8ede1144419b4f6cfe7f2ea6ed">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-dab6e1ab401e48e582531d6e6ac59621" relationshipRef="id-850accbdec3c410b8ce23c7edc6e5989" xsi:type="Relationship" source="id-f47c7f516014447391393ab40d71dd4b" target="id-ed3138021db24b10bb006a9737762841">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-381098b311f244d59e52ec28fa7c4f61" relationshipRef="id-c3ad97339b9e4dcab4637839b0b73f82" xsi:type="Relationship" source="id-09d658c5f23a43588e541d85b01a4507" target="id-c0f041955ab3400ca9acf1b18b60e45e">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-10f277c7c35349488f31f965c6aca985" relationshipRef="id-c3f93156de194c0092ef3ad2abc42961" xsi:type="Relationship" source="id-09d658c5f23a43588e541d85b01a4507" target="id-7a6feab43e214a5991ca5f505f6aaab3">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-3b159188e8d4409392674079b4c12037" relationshipRef="id-2b7858428a8540878727001522c81eca" xsi:type="Relationship" source="id-09d658c5f23a43588e541d85b01a4507" target="id-87d07771c7be4ed79b2b2c5f48df4d4b">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-99d07ae632e24d77b54792bee519aee4" relationshipRef="id-16f96c9684de4641a05352eaa5d41992" xsi:type="Relationship" source="id-87d07771c7be4ed79b2b2c5f48df4d4b" target="id-7a6feab43e214a5991ca5f505f6aaab3">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-4d8dda99a66d45f2959152539317d55a" relationshipRef="id-d93d6346636347df9b18e8014b4179d0" xsi:type="Relationship" source="id-87d07771c7be4ed79b2b2c5f48df4d4b" target="id-09d658c5f23a43588e541d85b01a4507">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-13fc35bb6c44495db0f389104073836b" relationshipRef="id-646381cc57cb4aefa62b95c59b6fe33d" xsi:type="Relationship" source="id-389cf7a4479848779e20e5ca5d18a55a" target="id-beb0c0194e7c4f0bb8dc9e837d0eaac0">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-b857b68efe9f41669c7786a6ebfcd2b4" relationshipRef="id-0e986f1917d8459cb66ad0a6d00608d4" xsi:type="Relationship" source="id-ca3dfd28816b4460bc534957dfff9cee" target="id-6413c4c39dcd419788b7272f417ce4e7">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-24677080e57e4bbc81e448c77283972b" relationshipRef="id-818a4f3bc7e449fa8f74773da7e56b9c" xsi:type="Relationship" source="id-7a6feab43e214a5991ca5f505f6aaab3" target="id-3c9d6c5c65db4f1a9e9a07956af963e0">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-475ab3243fe541fa907f3b2b21559f55" relationshipRef="id-9f7e37d4f12c40b1a8eb4d85f25ade6c" xsi:type="Relationship" source="id-7a6feab43e214a5991ca5f505f6aaab3" target="id-6413c4c39dcd419788b7272f417ce4e7">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-5eb4516e90e44c368ea23215ad542047" relationshipRef="id-25d91001477f40d9b0b04d1ade408151" xsi:type="Relationship" source="id-7a6feab43e214a5991ca5f505f6aaab3" target="id-87d07771c7be4ed79b2b2c5f48df4d4b">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-f75d5ce6c0c64512974caf61f271e015" relationshipRef="id-b8ce7e6c498644e59ecc2e51e2cf09c2" xsi:type="Relationship" source="id-7a6feab43e214a5991ca5f505f6aaab3" target="id-09d658c5f23a43588e541d85b01a4507">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-bff514b47a9e4011a34cb4c0ed8d7fe5" relationshipRef="id-1261bf4e56fc49629a5c62767f467d2b" xsi:type="Relationship" source="id-6413c4c39dcd419788b7272f417ce4e7" target="id-7a6feab43e214a5991ca5f505f6aaab3">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-1777ed969f194e3fa54c348b714e717a" relationshipRef="id-931f475a4fed4b6aaa1d3ad9836cb756" xsi:type="Relationship" source="id-6413c4c39dcd419788b7272f417ce4e7" target="id-ca3dfd28816b4460bc534957dfff9cee">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-c9ed30c96b664bcd990dfcfdfddb8f8b" relationshipRef="id-3f9944e7e7104be9a93cd9e56e54355d" xsi:type="Relationship" source="id-6413c4c39dcd419788b7272f417ce4e7" target="id-85e1fbc5288340de999949a19223ae09">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-22aaf37d6f6d4019a37d6b8ef3910aa8" relationshipRef="id-db16a06beac146259c73665aba5d53df" xsi:type="Relationship" source="id-85e1fbc5288340de999949a19223ae09" target="id-b5eba7fde22c45b1b2b7f70110a4ba61">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-f5cab0ba03bc459b87751a2749ee447b" relationshipRef="id-6466b1ce596a4c82b1ff16b59e814481" xsi:type="Relationship" source="id-ad2316f0a31644e8910830ee333450d8" target="id-ab09947f90b34723ac3bd16a1810d880">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-e674abac16034ba9a4873297949a5ec7" relationshipRef="id-761ced2fbdf24e0aa8d1ea931a215ea3" xsi:type="Relationship" source="id-ce6c52bb3a6040089b043efa54838898" target="id-b5eba7fde22c45b1b2b7f70110a4ba61">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-57e1dc02cce24a2e9929d45a0642ff65" relationshipRef="id-306d24f5874d473eb38405f92b52d4c8" xsi:type="Relationship" source="id-ce6c52bb3a6040089b043efa54838898" target="id-87d07771c7be4ed79b2b2c5f48df4d4b">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-49fde67ab5f8443ab37b93e28d584b9f" relationshipRef="id-5044870f27274033ba2d380abb74ca31" xsi:type="Relationship" source="id-b5eba7fde22c45b1b2b7f70110a4ba61" target="id-85e1fbc5288340de999949a19223ae09">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-f335b59dbdbc4fa2aedf55e01da3ddfd" relationshipRef="id-5bbf0aeff2f3450db600f327856811c1" xsi:type="Relationship" source="id-ed3138021db24b10bb006a9737762841" target="id-f47c7f516014447391393ab40d71dd4b">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-9fedd7facf054b5fb4c79c64f90c38dd" relationshipRef="id-33195dd4bf0a4215a6598661817d0165" xsi:type="Relationship" source="id-e73587ac131448c08ad4d38399905fe8" target="id-746abda889e2448f86036111b698d332">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-0112067cfe134c3f82dd3add113816e9" relationshipRef="id-d83196aafe8b487c9dd423b5ef704254" xsi:type="Relationship" source="id-e73587ac131448c08ad4d38399905fe8" target="id-ed3138021db24b10bb006a9737762841">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-90e71bcd53434194bc702508aff4776c" relationshipRef="id-cef6076706524d4f871df4738d3fe0a9" xsi:type="Relationship" source="id-ab09947f90b34723ac3bd16a1810d880" target="id-85e1fbc5288340de999949a19223ae09">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-7096bed19fcc4200b75b8cf3f27b23f2" relationshipRef="id-2b1b779e9e0f42e2b9c4222c4b1a9df1" xsi:type="Relationship" source="id-ab09947f90b34723ac3bd16a1810d880" target="id-3c9d6c5c65db4f1a9e9a07956af963e0">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-481308f7b18140c2b8e97f9ca7fd148a" relationshipRef="id-a7d7c8085d074fd6802a044c5725a345" xsi:type="Relationship" source="id-746abda889e2448f86036111b698d332" target="id-3c9d6c5c65db4f1a9e9a07956af963e0">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-9429fae3e2c24c95a576ff86ae072f55" relationshipRef="id-93295e8fb2d54d47b81976c12e3cdfed" xsi:type="Relationship" source="id-746abda889e2448f86036111b698d332" target="id-e73587ac131448c08ad4d38399905fe8">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+      </view>
+    </diagrams>
+  </views>
+</model>

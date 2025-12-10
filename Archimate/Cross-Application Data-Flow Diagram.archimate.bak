@@ -124,17 +124,7 @@ Workday HR/FI, Jira, CargoWise and IBM OMS and uses them for analysis and report
 Business Objects: Employee, Salary, Sortingcenter, Warehouse, Order, Report,
 Customer, Shipment, Driver, Network, Recipient</documentation>
     </element>
-    <element xsi:type="archimate:ApplicationComponent" name="RabbitMQ" id="id-03cdb4dc95c14054848e160f72c80d3b">
-      <documentation>Purpose: This application is somewhat special within the SpeedParcel landscape
-because it is a message-oriented middleware (MOM) through which all data passes. This
-means that all data flows through this application and thus it technically enables all
-capabilities. In order to not have to connect it with every capability, we have the edges
-out of the landscape map. Again, in order to keep the landscape readable, RabbitMQ is
-left out, as every data flow connection would have to run through it. It is technically in the
-middle between each connection in the diagram.
-
-Business Objects: n/a</documentation>
-    </element>
+    <element xsi:type="archimate:ApplicationComponent" name="RabbitMQ" id="id-03cdb4dc95c14054848e160f72c80d3b"/>
     <element xsi:type="archimate:ApplicationComponent" name="Power BI" id="id-e99eb842ea0b4fcbafa1797181f41fe2">
       <documentation>Purpose: Power BI serves as the central analytics and business intelligence platform for
 SpeedParcel. It aggregates, visualizes, and reports on data from all core operational and

@@ -38,6 +38,10 @@ You receive:
 2) The Neo4j schema.
 
 Very important modeling hints:
+- More data is stored in different nodes. The database consists of the nodes Application, BusinessObject, Capability, Chunk, Concept, Document, Embedding, and Section
+- The main textual and textbook knowledge is usually stored in :Chunk nodes (properties like 'text', 'context', 'table_summary').
+- Information about the business objects are stored in the :BusinessObject nodes and Association relationships
+- Information about the business capability support matrix (e.g. which applications support which capabilities) is stored in the :Capability nodes and SUPPORTS relationships.
 - The main *textual* knowledge is usually stored in nodes with the label :Chunk
   (e.g. properties like 'text', 'context', 'table_summary', etc.).
 - Higher-level nodes like :Concept often only provide structure, but not the full text.
@@ -62,7 +66,7 @@ ${schema}
 `;
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4.1", // or "gpt-4.1-mini"
+    model: "gpt-5", // or "gpt-5-nano"
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
@@ -76,7 +80,7 @@ ${schema}
 }
 
 // ------------------------------------
-// Helper: refine Cypher as fallback (focus on :Chunk)
+// Helper: refine fallback cyphers
 // ------------------------------------
 async function refineCypherForChunks(
   nlPrompt: string,
@@ -90,8 +94,11 @@ The previous Cypher query returned no rows.
 We suspect that it targeted the wrong labels (e.g. :Concept instead of :Chunk).
 
 Hints:
-- The main *textual* knowledge is usually stored in :Chunk nodes (properties like 'text', 'context', 'table_summary').
-- Try to refocus the query so that it searches or joins via :Chunk where appropriate.
+- More data is stored in different nodes. The database consists of the nodes Application, BusinessObject, Capability, Chunk, Concept, Document, Embedding, and Section
+- The main textual and textbook knowledge is usually stored in :Chunk nodes (properties like 'text', 'context', 'table_summary').
+- Information about the business objects are stored in the :BusinessObject nodes and Association relationships
+- Information about the business capability support matrix (e.g. which applications support which capabilities) is stored in the :Capability nodes and SUPPORTS relationships.
+- Try to refocus the query so that it matches the model
 - Only use labels, properties, and relationships that actually exist in the schema.
 - You may reuse parts of the previous query if still valid, but adjust the label/structure.
 
