@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Provider } from "./components/ui/provider";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { Button, Textarea, Text } from "@chakra-ui/react";
+import { Button, Textarea, Text, Clipboard, Icon } from "@chakra-ui/react";
 import Header from "./components/ui/Header";
 import { colors } from "./utils/colors";
 import ReactMarkdown from "react-markdown";
@@ -10,6 +8,7 @@ import remarkGfm from "remark-gfm";
 interface ChatMessage {
   role: "user" | "agent";
   content: string;
+  cypher?: string;
 }
 
 export default function App() {
@@ -65,7 +64,7 @@ export default function App() {
 
         setChatHistory((prev) => [
           ...prev,
-          { role: "agent", content: agentText },
+          { role: "agent", content: agentText, cypher: data.cypher },
         ]);
       }
     } catch (err: any) {
@@ -200,6 +199,7 @@ export default function App() {
               </div>
             );
           } else {
+            // Chatbot / agent message
             return (
               <div
                 key={idx}
@@ -257,6 +257,35 @@ export default function App() {
                     {normalized}
                   </ReactMarkdown>
                 </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(msg.cypher || "");
+                  }}
+                  px="0.5rem"
+                  py="0.1rem"
+                  borderColor={colors.cream}
+                  color={colors.cream}
+                  fontWeight="bold"
+                  display="inline-flex"
+                  alignItems="center"
+                  _hover={{
+                    bg: colors.cream,
+                    color: "black",
+                  }}
+                >
+                  Copy Cypher
+                  <Clipboard.Root value={msg.cypher || ""}>
+                    <Clipboard.Trigger asChild>
+                      <Icon
+                        as={Clipboard.Indicator}
+                        ml="0.5rem"
+                        boxSize="0.9em"
+                        pointerEvents="none"
+                      />
+                    </Clipboard.Trigger>
+                  </Clipboard.Root>
+                </Button>
               </div>
             );
           }
