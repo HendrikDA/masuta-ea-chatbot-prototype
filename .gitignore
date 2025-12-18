@@ -1,5 +1,8 @@
 # Ignore real environment files
 .env
 
+./graph-data/*
+
 # But allow example env files
 !.env.example
+
