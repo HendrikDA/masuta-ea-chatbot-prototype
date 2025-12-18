@@ -323,7 +323,7 @@ export default function App() {
           // border colors purple gradient
           borderColor={colors.purple}
           borderWidth="3px"
-          placeholder="Ask Masuta something about your enterprise architecture..."
+          placeholder="Ask Masutā something about your enterprise architecture..."
           _placeholder={{ color: "inherit" }}
           value={userPrompt}
           resize="none"

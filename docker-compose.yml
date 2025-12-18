@@ -20,6 +20,13 @@ services:
     environment:
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
       - NEO4J_AUTH=${LOCAL_NEO4J_DB_USERNAME}/${LOCAL_NEO4J_DB_PASSWORD}
+      # APOC
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+      # allow APOC procedures
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
     volumes:
       - $HOME/neo4j/logs:/logs
       - $HOME/neo4j/config:/config
@@ -35,6 +42,13 @@ services:
     environment:
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
       - NEO4J_AUTH=${EMPTY_NEO4J_DB_USERNAME}/${EMPTY_NEO4J_DB_PASSWORD}
+      # APOC
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+      # allow APOC procedures
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
     volumes:
       - $HOME/neo4j_empty/logs:/logs
       - $HOME/neo4j_empty/config:/config

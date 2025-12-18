@@ -3,7 +3,8 @@ import express from "express";
 import "dotenv/config";
 import cors from "cors";
 import {
-  initNeo4jMcp,
+  ensureNeo4jMcp,
+  getCurrentDbTarget,
   readCypher,
   shutdownNeo4jMcp,
 } from "./neo4jMcpClient.js";
@@ -260,10 +261,35 @@ app.post("/api/neo4j/query", async (req, res) => {
 });
 
 // ------------------------------------
-// Start server + init MCP
+// POST /api/neo4j/togglespeedparcel
+// Body: { prompt: "How many capabilities are supported by StatManPlus?" }
+// ------------------------------------
+app.post("/api/neo4j/togglespeedparcel", async (req, res) => {
+  try {
+    const { use_speedparcel } = req.body as { use_speedparcel?: boolean };
+
+    if (use_speedparcel === undefined || typeof use_speedparcel !== "boolean") {
+      return res
+        .status(400)
+        .json({ error: "Missing or invalid 'use_speedparcel' in body" });
+    }
+
+    console.log("Toggling. Using SpeedParcel data?:", use_speedparcel);
+
+    await ensureNeo4jMcp(use_speedparcel);
+
+    res.json({ status: "ok", use_speedparcel, active: getCurrentDbTarget() });
+  } catch (err: any) {
+    console.error("[API] Error in /api/neo4j/togglespeedparcel:", err);
+    res.status(500).json({ error: err.message ?? "Internal server error" });
+  }
+});
+
+// ------------------------------------
+// Start server (no DB init here)
 // ------------------------------------
 async function start() {
-  await initNeo4jMcp();
+  await ensureNeo4jMcp(true); // default to SpeedParcel on startup
 
   app.listen(PORT, () => {
     console.log(`Server listening on http://localhost:${PORT}`);

@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import { colors } from "../../utils/colors";
 import { Switch } from "@chakra-ui/react";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 export default function Header() {
   const [RAGisActive, setRAGisActive] = useState(true);
 
   const toggleRAG = async (checked) => {
     try {
-      await fetch("http://localhost:8000/rag/toggle", {
+      await fetch("http://localhost:4000/api/neo4j/togglespeedparcel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ use_rag: checked }),
+        body: JSON.stringify({ use_speedparcel: checked }),
       });
     } catch (e: any) {
       console.log("Error toggling RAG:", e.message);
@@ -49,7 +48,7 @@ export default function Header() {
           fontFamily: "system-ui, sans-serif",
         }}
       >
-        <b>Masuta 達人</b> - Your Enterprise Architecture Assistant
+        <b>Masutā 達人</b> - Your Enterprise Architecture Assistant
       </div>
       <div
         style={{
@@ -67,7 +66,9 @@ export default function Header() {
           <Switch.HiddenInput />
           <Switch.Control />
           <Switch.Label>
-            {RAGisActive ? "RAG is Activated" : "RAG is Deactivated"}
+            {RAGisActive
+              ? "Using SpeedParcel Data"
+              : "Using playground database"}
           </Switch.Label>
         </Switch.Root>
       </div>
