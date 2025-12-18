@@ -1,0 +1,17 @@
+services:
+  # Might have to run rm -rf $HOME/neo4j/data to reset the DB
+  neo4j:
+    image: neo4j:latest
+    volumes:
+      - $HOME/neo4j/logs:/logs
+      - $HOME/neo4j/config:/config
+      - $HOME/neo4j/data:/data
+      - $HOME/neo4j/plugins:/plugins
+    env_file:
+      - .env
+    environment:
+      - NEO4J_AUTH=${LOCAL_NEO4J_DB_USERNAME}/${LOCAL_NEO4J_DB_PASSWORD}
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    restart: always
