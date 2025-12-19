@@ -7,6 +7,7 @@ import {
   getCurrentDbTarget,
   readCypher,
   shutdownNeo4jMcp,
+  writeCypher,
 } from "./neo4jMcpClient.js";
 
 import OpenAI from "openai";
@@ -186,6 +187,25 @@ ${JSON.stringify(rows, null, 2)}
   return answer;
 }
 
+export async function resetPlaygroundGraphDatabase() {
+  // Ensure we are connected to playground (useSpeedparcel = false)
+  await ensureNeo4jMcp(false);
+
+  // Safety check: never wipe speedparcel
+  if (getCurrentDbTarget() !== "playground") {
+    throw new Error("Refusing to reset DB because target is not 'playground'.");
+  }
+
+  // One transaction-ish query (Neo4j will run it as a single statement)
+  // NOTE: This will delete ALL nodes + relationships in the selected database.
+  const query = `
+    MATCH (n)
+    DETACH DELETE n
+  `;
+
+  return await writeCypher(query);
+}
+
 // ------------------------------------
 // GET /health
 // ------------------------------------
@@ -282,6 +302,16 @@ app.post("/api/neo4j/togglespeedparcel", async (req, res) => {
   } catch (err: any) {
     console.error("[API] Error in /api/neo4j/togglespeedparcel:", err);
     res.status(500).json({ error: err.message ?? "Internal server error" });
+  }
+});
+
+// Endpoint to reset the graph database
+app.post("/api/admin/reset-graph", async (_req, res) => {
+  try {
+    await resetPlaygroundGraphDatabase();
+    res.status(200).json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false, error: String(e) });
   }
 });
 

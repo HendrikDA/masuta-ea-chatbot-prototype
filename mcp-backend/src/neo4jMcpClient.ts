@@ -17,7 +17,7 @@ const NEO4J_ENV_PLAYGROUND: Record<string, string> = {
   NEO4J_USERNAME: process.env.LOCAL_PLAYGROUND_NEO4J_USER!,
   NEO4J_PASSWORD: process.env.LOCAL_PLAYGROUND_NEO4J_PASSWORD!,
   NEO4J_DATABASE: process.env.LOCAL_PLAYGROUND_NEO4J_DATABASE!,
-  NEO4J_READ_ONLY: "true",
+  NEO4J_READ_ONLY: "false",
   NEO4J_TELEMETRY: "false",
 };
 
@@ -113,6 +113,37 @@ export async function readCypher(query: string) {
       method: "tools/call",
       params: {
         name: "read-cypher",
+        arguments: { query },
+      },
+    },
+    CallToolResultSchema
+  );
+
+  if ((result as any).isError) {
+    const msg = (result as any).content?.[0]?.text ?? "Unknown Neo4j MCP error";
+    throw new Error(msg);
+  }
+
+  const first = result.content[0];
+  if (!first || first.type !== "text") {
+    throw new Error("Unexpected MCP response format");
+  }
+
+  return JSON.parse(first.text);
+}
+
+export async function writeCypher(query: string) {
+  if (!client) {
+    throw new Error(
+      "Neo4j MCP client not initialized. Call ensureNeo4jMcp() first."
+    );
+  }
+
+  const result = await client.request(
+    {
+      method: "tools/call",
+      params: {
+        name: "write-cypher",
         arguments: { query },
       },
     },

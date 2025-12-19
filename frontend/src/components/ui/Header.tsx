@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { colors } from "../../utils/colors";
 import { Switch } from "@chakra-ui/react";
+import { CustomMenu } from "./Menu";
 
 export default function Header() {
-  const [RAGisActive, setRAGisActive] = useState(true);
+  const [speedParcelIsActive, setSpeedParcelIsActive] = useState(false);
 
   const toggleRAG = async (checked) => {
     try {
@@ -15,7 +16,7 @@ export default function Header() {
     } catch (e: any) {
       console.log("Error toggling RAG:", e.message);
     } finally {
-      setRAGisActive(checked);
+      setSpeedParcelIsActive(checked);
     }
   };
 
@@ -39,6 +40,14 @@ export default function Header() {
     >
       <div
         style={{
+          position: "absolute",
+          left: "1rem",
+        }}
+      >
+        <CustomMenu speedParcelIsActive={speedParcelIsActive} />
+      </div>
+      <div
+        style={{
           maxWidth: "30em",
           width: "100%",
           textAlign: "center",
@@ -60,13 +69,14 @@ export default function Header() {
       >
         <Switch.Root
           colorPalette="green"
-          checked={RAGisActive}
+          checked={speedParcelIsActive}
           onCheckedChange={({ checked }) => toggleRAG(checked)}
+          default={true}
         >
           <Switch.HiddenInput />
           <Switch.Control />
           <Switch.Label>
-            {RAGisActive
+            {speedParcelIsActive
               ? "Using SpeedParcel Data"
               : "Using playground database"}
           </Switch.Label>
