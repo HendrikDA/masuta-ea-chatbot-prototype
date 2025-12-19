@@ -4,6 +4,7 @@ import Header from "./components/ui/Header";
 import { colors } from "./utils/colors";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Toaster, toaster } from "./components/ui/toaster";
 
 interface ChatMessage {
   role: "user" | "agent";
@@ -261,9 +262,15 @@ export default function App() {
                   variant="outline"
                   onClick={() => {
                     navigator.clipboard.writeText(msg.cypher || "");
+                    toaster.create({
+                      description: "Cypher copied to clipboard.",
+                      type: "success",
+                    });
                   }}
                   px="0.5rem"
                   py="0.1rem"
+                  height="2rem"
+                  fontSize="0.65rem"
                   borderColor={colors.cream}
                   color={colors.cream}
                   fontWeight="bold"
@@ -367,6 +374,7 @@ export default function App() {
           }}
         />
       </div>
+      <Toaster />
     </>
   );
 }
