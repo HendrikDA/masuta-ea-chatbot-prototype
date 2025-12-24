@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button, Menu, Portal, Dialog, CloseButton } from "@chakra-ui/react";
 import { FaTrashAlt } from "react-icons/fa";
 import { IoMdMenu } from "react-icons/io";
@@ -11,18 +11,14 @@ interface CustomMenuProps {
 export const CustomMenu: React.FC<CustomMenuProps> = ({
   speedParcelIsActive,
 }) => {
-  const [isResetting, setIsResetting] = useState(false);
-
   async function handleReset() {
     try {
-      setIsResetting(true);
       await resetPlaygroundDatabase();
       window.location.reload();
     } catch (e) {
       console.error(e);
       alert("Reset failed");
     } finally {
-      setIsResetting(false);
       alert("Database reset successfully");
     }
   }
@@ -61,7 +57,8 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
               <Dialog.Trigger asChild disabled={speedParcelIsActive}>
                 <Menu.Item value="reset_db" disabled={speedParcelIsActive}>
                   <FaTrashAlt style={{ marginRight: "0.5rem" }} />
-                  Reset Playground Database
+                  Reset Playground Database{" "}
+                  {speedParcelIsActive ? "(must have it selected)" : ""}
                 </Menu.Item>
               </Dialog.Trigger>
             </Menu.Content>
