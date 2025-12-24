@@ -64,6 +64,7 @@ services:
       - $HOME/neo4j_empty/config:/config
       - $HOME/neo4j_empty/data:/data
       - $HOME/neo4j_empty/plugins:/plugins
+      - /Users/U777053/Documents/Uni/FraUAS/Masterarbeit/prototype/graphdb-parser/sources/Data:/var/lib/neo4j/import/data # This loads example data so that apoc calls can be made
     ports:
       - "7475:7474"
       - "7688:7687"
