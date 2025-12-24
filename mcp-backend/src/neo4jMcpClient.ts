@@ -132,7 +132,10 @@ export async function readCypher(query: string) {
   return JSON.parse(first.text);
 }
 
-export async function writeCypher(query: string) {
+export async function writeCypher(
+  query: string,
+  params: Record<string, any> = {}
+) {
   if (!client) {
     throw new Error(
       "Neo4j MCP client not initialized. Call ensureNeo4jMcp() first."
@@ -144,7 +147,7 @@ export async function writeCypher(query: string) {
       method: "tools/call",
       params: {
         name: "write-cypher",
-        arguments: { query },
+        arguments: { query, params },
       },
     },
     CallToolResultSchema
@@ -156,9 +159,8 @@ export async function writeCypher(query: string) {
   }
 
   const first = result.content[0];
-  if (!first || first.type !== "text") {
+  if (!first || first.type !== "text")
     throw new Error("Unexpected MCP response format");
-  }
 
   return JSON.parse(first.text);
 }

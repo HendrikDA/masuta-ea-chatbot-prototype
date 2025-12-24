@@ -11,6 +11,7 @@ import {
 } from "./neo4jMcpClient.js";
 
 import OpenAI from "openai";
+import { importArchiXmlFromNeo4jImportDir } from "./apoc-transpiler/transpile.js";
 
 // --------------------
 // OpenAI Client Setup
@@ -312,6 +313,17 @@ app.post("/api/admin/reset-graph", async (_req, res) => {
     res.status(200).json({ success: true });
   } catch (e) {
     res.status(500).json({ success: false, error: String(e) });
+  }
+});
+
+// Endpoint to reset the graph database
+app.post("/api/admin/add-data", async (req, res) => {
+  try {
+    const fileName = String(req.body?.fileName ?? "");
+    const result = await importArchiXmlFromNeo4jImportDir(fileName);
+    res.json({ ok: true, result });
+  } catch (err: any) {
+    res.status(400).json({ ok: false, error: err?.message ?? String(err) });
   }
 });
 
