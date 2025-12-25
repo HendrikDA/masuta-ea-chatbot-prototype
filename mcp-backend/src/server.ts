@@ -13,6 +13,7 @@ import {
 import OpenAI from "openai";
 import { importArchiXmlFromNeo4jImportDir } from "./apoc-transpiler/transpile.js";
 import { upload } from "./apoc-transpiler/uploader.js";
+import { runCypherFile } from "./restore-cyphers.js";
 
 // --------------------
 // OpenAI Client Setup
@@ -190,22 +191,43 @@ ${JSON.stringify(rows, null, 2)}
 }
 
 export async function resetPlaygroundGraphDatabase() {
-  // Ensure we are connected to playground (useSpeedparcel = false)
   await ensureNeo4jMcp(false);
 
-  // Safety check: never wipe speedparcel
   if (getCurrentDbTarget() !== "playground") {
     throw new Error("Refusing to reset DB because target is not 'playground'.");
   }
 
-  // One transaction-ish query (Neo4j will run it as a single statement)
-  // NOTE: This will delete ALL nodes + relationships in the selected database.
-  const query = `
+  const batchQuery = `
     MATCH (n)
+    WITH n LIMIT 10000
     DETACH DELETE n
+    RETURN count(n) AS deleted
   `;
 
-  return await writeCypher(query);
+  let total = 0;
+  const maxBatches = 100000; // safety guard
+
+  for (let i = 0; i < maxBatches; i++) {
+    const rows = await writeCypher(batchQuery);
+
+    // MCP returns rows as JSON (array). Expect: [{ deleted: <number> }]
+    const deleted = Array.isArray(rows) ? Number(rows?.[0]?.deleted ?? 0) : 0;
+
+    total += deleted;
+
+    if (deleted === 0) {
+      console.log(`[RESET] Done. Total deleted: ${total}`);
+      return { ok: true, deleted: total };
+    }
+
+    if (i % 10 === 0) {
+      console.log(`[RESET] Batch ${i + 1}: deleted ${deleted}, total ${total}`);
+    }
+  }
+
+  throw new Error(
+    `[RESET] Aborted after ${maxBatches} batches (deleted so far: ${total}).`
+  );
 }
 
 // ------------------------------------
@@ -311,8 +333,14 @@ app.post("/api/neo4j/togglespeedparcel", async (req, res) => {
 app.post("/api/admin/reset-graph", async (_req, res) => {
   try {
     await resetPlaygroundGraphDatabase();
+
+    const result = await runCypherFile("/seeds/lehrbuch.cypher");
+
+    console.log("Result of lehrbuch cypher: ", result);
+
     res.status(200).json({ success: true });
   } catch (e) {
+    console.log("Error during graph reset: ", e);
     res.status(500).json({ success: false, error: String(e) });
   }
 });

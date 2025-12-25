@@ -8,6 +8,10 @@ import {
   FileUpload,
   Icon,
   Box,
+  Spinner,
+  VStack,
+  Text,
+  Center,
 } from "@chakra-ui/react";
 import { FaTrashAlt } from "react-icons/fa";
 import { IoMdMenu } from "react-icons/io";
@@ -26,6 +30,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
   const [importOpen, setImportOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function resetPlaygroundDatabase(): Promise<void> {
     const response = await fetch(
@@ -42,14 +47,17 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
 
   async function handleReset() {
     try {
+      setIsLoading(true);
       await resetPlaygroundDatabase();
-      // close dialog first so UI doesn't feel "stuck"
+
       setResetOpen(false);
       window.location.reload();
       alert("Playground database reset successfully");
     } catch (e) {
       console.error(e);
       alert("Reset failed");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -97,6 +105,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
       setIsUploading(true);
       const result = await uploadFilesToBackend(selectedFiles);
       console.log("Import result:", result);
+      window.location.reload();
       alert("Import successful");
     } catch (e) {
       console.error(e);
@@ -108,6 +117,23 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
 
   return (
     <>
+      {isLoading && (
+        <Portal>
+          <Box
+            position="fixed"
+            inset={0}
+            aria-busy="true"
+            userSelect="none"
+            bg="bg/80"
+            zIndex="toast" // higher than modal/dialog
+          >
+            <Center h="full">
+              <Spinner size="xl" color="teal.500" />
+              <Text paddingLeft="2rem">Loading... This will take a while.</Text>
+            </Center>
+          </Box>
+        </Portal>
+      )}
       {/* ===== MENU ===== */}
       <Menu.Root open={menuOpen} onOpenChange={(e) => setMenuOpen(e.open)}>
         <Menu.Trigger asChild>
