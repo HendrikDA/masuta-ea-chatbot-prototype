@@ -30,11 +30,25 @@ The next step will now be able to read this data and prefill one of the two grap
 
 Execute the following commands individually. This restores any potential data saved in the container.
 
+Remove any lingering containers or data
+
 ```
 docker compose down
 rm -rf $HOME/neo4j/data
 rm -rf $HOME/neo4j_empty/data
-docker compose --profile restore run --rm neo4j-restore
+```
+
+Populate the databases with example data
+
+```
+docker compose --profile speedparcel-restore run --rm speedparcel-restore
+docker compose --profile lehrbuch-restore  run --rm lehrbuch-restore
+```
+
+Execute all containers
+
+```
+docker-compose up
 ```
 
 ### Running the Application and All Components

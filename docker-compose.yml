@@ -1,19 +1,35 @@
 services:
-  neo4j-restore:
+  speedparcel-restore:
     image: neo4j:2025-enterprise
     environment:
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
     volumes:
       - $HOME/neo4j/data:/data
-      - ./graph-data:/backups:ro
+      - ./speedparcel-data:/speedparcel-backups:ro
     entrypoint: ["/var/lib/neo4j/bin/neo4j-admin"]
     command:
       - "database"
       - "load"
       - "neo4j"
-      - "--from-path=/backups"
+      - "--from-path=/speedparcel-backups"
       - "--overwrite-destination=true"
-    profiles: ["restore"]
+    profiles: ["speedparcel-restore"]
+
+  lehrbuch-restore:
+    image: neo4j:2025-enterprise
+    environment:
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+    volumes:
+      - $HOME/neo4j_empty/data:/data
+      - ./lehrbuch-data:/lehrbuch-backups:ro
+    entrypoint: ["/var/lib/neo4j/bin/neo4j-admin"]
+    command:
+      - "database"
+      - "load"
+      - "neo4j"
+      - "--from-path=/lehrbuch-backups"
+      - "--overwrite-destination=true"
+    profiles: ["lehrbuch-restore"]
 
   neo4j_speedparcel:
     image: neo4j:2025-enterprise
@@ -52,9 +68,9 @@ services:
     environment:
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
       - NEO4J_AUTH=${EMPTY_NEO4J_DB_USERNAME}/${EMPTY_NEO4J_DB_PASSWORD}
-      - NEO4J_server_memory_heap_initial__size=2G
-      - NEO4J_server_memory_heap_max__size=2G
-      - NEO4J_server_memory_pagecache_size=1G
+      - NEO4J_server_memory_heap_initial__size=4G
+      - NEO4J_server_memory_heap_max__size=4G
+      - NEO4J_server_memory_pagecache_size=2G
       # APOC
       - NEO4J_PLUGINS=["apoc"]
       - NEO4J_apoc_import_file_enabled=true
@@ -107,7 +123,6 @@ services:
       - ./mcp-backend:/app
       - /app/node_modules
       - /Users/U777053/Documents/Uni/FraUAS/Masterarbeit/prototype/graphdb-parser/sources/Data:/uploads # for file uploads
-      - ./graph-seeds:/seeds:ro
     depends_on:
       neo4j_speedparcel:
         condition: service_healthy

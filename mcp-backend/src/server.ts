@@ -13,7 +13,6 @@ import {
 import OpenAI from "openai";
 import { importArchiXmlFromNeo4jImportDir } from "./apoc-transpiler/transpile.js";
 import { upload } from "./apoc-transpiler/uploader.js";
-import { runCypherFile } from "./restore-cyphers.js";
 
 // --------------------
 // OpenAI Client Setup
@@ -333,10 +332,6 @@ app.post("/api/neo4j/togglespeedparcel", async (req, res) => {
 app.post("/api/admin/reset-graph", async (_req, res) => {
   try {
     await resetPlaygroundGraphDatabase();
-
-    const result = await runCypherFile("/seeds/lehrbuch.cypher");
-
-    console.log("Result of lehrbuch cypher: ", result);
 
     res.status(200).json({ success: true });
   } catch (e) {

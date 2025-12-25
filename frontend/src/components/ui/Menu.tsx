@@ -128,8 +128,8 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
             zIndex="toast" // higher than modal/dialog
           >
             <Center h="full">
-              <Spinner size="xl" color="teal.500" />
-              <Text paddingLeft="2rem">Loading... This will take a while.</Text>
+              <Spinner size="xl" color={colors.purple} />
+              <Text paddingLeft="2rem">Loading...</Text>
             </Center>
           </Box>
         </Portal>
