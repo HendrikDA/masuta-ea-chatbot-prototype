@@ -2,6 +2,7 @@ import { ensureNeo4jMcp, writeCypher } from "../neo4jMcpClient.js";
 import { ELEMENTS_CYPHER, RELS_CYPHER } from "./transpiler-cyphers.js";
 
 function assertSafeXmlFilename(fileName: string) {
+  console.log("Asserting filename:", fileName);
   // Prevent "../", absolute paths, weird chars
   if (!/^[A-Za-z0-9._-]+\.xml$/i.test(fileName)) {
     throw new Error("Invalid filename. Use something like 'BOM.xml'.");
@@ -32,12 +33,13 @@ RETURN nodes, rels;
 }
 
 export async function importArchiXmlFromNeo4jImportDir(fileName: string) {
+  console.log("Filename: ", fileName);
   assertSafeXmlFilename(fileName);
 
   // write DB
   await ensureNeo4jMcp(false);
 
-  const fileUrl = `file:///data/${fileName}`;
+  const fileUrl = `file:///data/${fileName}`; // Todo: Replace the local preconfigured file with the uploaded version
 
   // 1) constraints (optional but recommended)
   await writeCypher(cypherCreateConstraints());

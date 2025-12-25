@@ -75,6 +75,8 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
       formData.append("files", file, file.name);
     }
 
+    console.log("Sending this form data: ", formData);
+
     const response = await fetch("http://localhost:4000/api/admin/add-data", {
       method: "POST",
       body: formData,

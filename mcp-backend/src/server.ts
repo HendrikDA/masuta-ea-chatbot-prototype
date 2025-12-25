@@ -12,6 +12,7 @@ import {
 
 import OpenAI from "openai";
 import { importArchiXmlFromNeo4jImportDir } from "./apoc-transpiler/transpile.js";
+import { upload } from "./apoc-transpiler/uploader.js";
 
 // --------------------
 // OpenAI Client Setup
@@ -316,14 +317,29 @@ app.post("/api/admin/reset-graph", async (_req, res) => {
   }
 });
 
-// Endpoint to reset the graph database
-app.post("/api/admin/add-data", async (req, res) => {
+// Endpoint to add data to the graph database
+app.post("/api/admin/add-data", upload.array("files", 10), async (req, res) => {
   try {
-    const fileName = String(req.body?.fileName ?? "");
-    const result = await importArchiXmlFromNeo4jImportDir(fileName);
-    res.json({ ok: true, result });
-  } catch (err: any) {
-    res.status(400).json({ ok: false, error: err?.message ?? String(err) });
+    const files = (req.files as Express.Multer.File[]) ?? [];
+
+    if (!files.length) {
+      return res.status(400).json({
+        success: false,
+        error: "No files uploaded. Use form-data key 'files'.",
+      });
+    }
+
+    // Import each uploaded file
+    const results = [];
+    for (const f of files) {
+      // Important: pass ONLY the filename; Neo4j reads it via file:///data/<name>.xml
+      const r = await importArchiXmlFromNeo4jImportDir(f.filename);
+      results.push({ file: f.filename, result: r });
+    }
+
+    res.status(200).json({ success: true, results });
+  } catch (e: any) {
+    res.status(500).json({ success: false, error: e?.message ?? String(e) });
   }
 });
 

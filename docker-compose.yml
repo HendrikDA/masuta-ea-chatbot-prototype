@@ -103,6 +103,7 @@ services:
     volumes:
       - ./mcp-backend:/app
       - /app/node_modules
+      - /Users/U777053/Documents/Uni/FraUAS/Masterarbeit/prototype/graphdb-parser/sources/Data:/uploads # for file uploads
     depends_on:
       neo4j_speedparcel:
         condition: service_healthy
