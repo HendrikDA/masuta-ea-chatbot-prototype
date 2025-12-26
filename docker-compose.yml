@@ -135,9 +135,6 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # For CRA, env vars must start with REACT_APP_
-      #- REACT_APP_API_BASE=http://localhost:4000
-      # Required in Docker sometimes (file watcher)
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
     volumes:

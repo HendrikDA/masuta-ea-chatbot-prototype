@@ -70,7 +70,7 @@ async function connectToTarget(target: DbTarget) {
  * Ensure we're connected to the requested database. If already connected to that DB, do nothing.
  * If connected to the other DB, reconnect.
  */
-export async function ensureNeo4jMcp(useSpeedparcel: boolean = true) {
+export async function ensureNeo4jMcp(useSpeedparcel: boolean = false) {
   const desiredTarget = targetFromFlag(useSpeedparcel);
 
   // If we’re already connected to the right DB, nothing to do.

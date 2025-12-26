@@ -1,23 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { colors } from "../../utils/colors";
 import { Switch } from "@chakra-ui/react";
 import { CustomMenu } from "./Menu";
+import { loadActiveDb, saveActiveDb } from "../../utils/dbToggle";
 
-export default function Header() {
-  const [speedParcelIsActive, setSpeedParcelIsActive] = useState(false);
+interface HeaderProps {
+  activeDb: "playground" | "speedparcel";
+  onDbChange: (db: "playground" | "speedparcel") => void;
+}
 
-  const toggleRAG = async (checked) => {
-    try {
-      await fetch("http://localhost:4000/api/neo4j/togglespeedparcel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ use_speedparcel: checked }),
-      });
-    } catch (e: any) {
-      console.log("Error toggling RAG:", e.message);
-    } finally {
-      setSpeedParcelIsActive(checked);
-    }
+export default function Header({ activeDb, onDbChange }: HeaderProps) {
+  const speedParcelIsActive = activeDb === "speedparcel";
+
+  // Sync backend to cookie value on mount AND whenever activeDb changes
+  useEffect(() => {
+    fetch("http://localhost:4000/api/neo4j/togglespeedparcel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ use_speedparcel: speedParcelIsActive }),
+    }).catch((e) => console.log("Error toggling DB:", e));
+  }, [speedParcelIsActive]);
+
+  const toggleSpeedParcelOrPlayground = async (checked: boolean) => {
+    const nextDb = checked ? "speedparcel" : "playground";
+    saveActiveDb(nextDb);
+    onDbChange(nextDb);
   };
 
   return (
@@ -70,7 +77,9 @@ export default function Header() {
         <Switch.Root
           colorPalette="green"
           checked={speedParcelIsActive}
-          onCheckedChange={({ checked }) => toggleRAG(checked)}
+          onCheckedChange={({ checked }) =>
+            toggleSpeedParcelOrPlayground(checked)
+          }
           default={true}
         >
           <Switch.HiddenInput />

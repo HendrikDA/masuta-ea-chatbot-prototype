@@ -1,4 +1,5 @@
 "use client";
+import { colors } from "../../utils/colors";
 import type { IconButtonProps, SpanProps } from "@chakra-ui/react";
 import { ClientOnly, IconButton, Skeleton, Span } from "@chakra-ui/react";
 import { ThemeProvider, useTheme } from "next-themes";
@@ -9,6 +10,11 @@ import { LuMoon, LuSun } from "react-icons/lu";
 export interface ColorModeProviderProps extends ThemeProviderProps {}
 
 export function ColorModeProvider(props: ColorModeProviderProps) {
+  const styles = {
+    backgroundColor: colors.dark,
+    color: "white",
+    minHeight: "100vh",
+  };
   return (
     <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
   );

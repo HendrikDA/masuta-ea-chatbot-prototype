@@ -370,7 +370,7 @@ app.post("/api/admin/add-data", upload.array("files", 10), async (req, res) => {
 // Start server (no DB init here)
 // ------------------------------------
 async function start() {
-  await ensureNeo4jMcp(true); // default to SpeedParcel on startup
+  await ensureNeo4jMcp(); // default to SpeedParcel on startup
 
   app.listen(PORT, () => {
     console.log(`Server listening on http://localhost:${PORT}`);

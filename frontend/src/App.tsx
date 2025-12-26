@@ -1,10 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Textarea, Text, Clipboard, Icon } from "@chakra-ui/react";
+import {
+  Button,
+  Textarea,
+  Text,
+  Heading,
+  Clipboard,
+  Icon,
+} from "@chakra-ui/react";
 import Header from "./components/ui/Header";
 import { colors } from "./utils/colors";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Toaster, toaster } from "./components/ui/toaster";
+import { ActiveDb, loadActiveDb } from "./utils/dbToggle";
 
 interface ChatMessage {
   role: "user" | "agent";
@@ -18,6 +26,12 @@ export default function App() {
   const [output, setOutput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [activeDb, setActiveDb] = useState<ActiveDb>(() => loadActiveDb());
+
+  const handleDbChange = (db: ActiveDb) => {
+    setActiveDb(db);
+  };
 
   const controllerRef = useRef<AbortController | null>(null);
   const bufferRef = useRef<string>("");
@@ -103,18 +117,35 @@ export default function App() {
 
   return (
     <>
-      <Header />
+      <Header activeDb={activeDb} onDbChange={handleDbChange} />
+
       <div
         style={{
           maxWidth: 720,
           margin: "0 auto",
-          // calculate height minus header and input area
           paddingTop: "2rem",
           paddingBottom: "8rem",
           overflowY: "auto",
           fontFamily: "system-ui",
+
+          minHeight: "calc(100vh - 10rem)", // header + input approx
+          display: chatHistory.length === 0 ? "flex" : "block",
+          alignItems: chatHistory.length === 0 ? "center" : undefined,
+          justifyContent: chatHistory.length === 0 ? "center" : undefined,
         }}
       >
+        {chatHistory.length === 0 && (
+          <Heading
+            size="2xl"
+            textAlign="center"
+            fontFamily="system-ui, sans-serif"
+            fontStyle="italic"
+          >
+            {activeDb === "speedparcel"
+              ? "Ask Masutā something about SpeedParcel's enterprise architecture!"
+              : "Import your data and ask Masutā something about it!"}
+          </Heading>
+        )}
         {chatHistory.map((msg, idx) => {
           const baseStyle: React.CSSProperties = {
             width: "90%",
@@ -332,7 +363,6 @@ export default function App() {
           </div>
         )}
       </div>
-
       <div
         style={{
           position: "fixed",
