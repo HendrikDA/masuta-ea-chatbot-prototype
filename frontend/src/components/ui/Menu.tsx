@@ -181,11 +181,14 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
                   setConnectionStringMenuOpen(true);
                 }}
               >
-                <FaExternalLinkAlt style={{ marginRight: "0.5rem" }} />
                 <Link
                   target="_blank"
                   href="https://console-preview.neo4j.io/tools/query"
+                  _focus={{ boxShadow: "none" }}
+                  outline="none"
+                  border="none"
                 >
+                  <FaExternalLinkAlt style={{ marginRight: "0.5rem" }} />
                   View graph data in Neo4j Browser
                 </Link>
               </Menu.Item>
