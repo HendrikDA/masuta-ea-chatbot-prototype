@@ -1,8 +1,20 @@
 # Ignore real environment files
 .env
 
-./graph-data/*
+# Ignore all contents of these folders
+graph-data/*
+lehrbuch-data/*
+speedparcel-data/*
 
-# But allow example env files
+# Re-allow the folders themselves
+!graph-data/
+!lehrbuch-data/
+!speedparcel-data/
+
+# Re-allow placeholder files
+!lehrbuch-data/.gitkeep
+!speedparcel-data/.gitkeep
+!graph-data/.gitkeep
+
+# Allow example env
 !.env.example
-
