@@ -3,18 +3,22 @@ import {
   Button,
   Menu,
   Portal,
+  Clipboard,
   Dialog,
+  IconButton,
   CloseButton,
   FileUpload,
   Icon,
   Box,
   Spinner,
-  VStack,
+  Link,
   Text,
   Center,
 } from "@chakra-ui/react";
 import { FaTrashAlt } from "react-icons/fa";
+import { FiUpload } from "react-icons/fi";
 import { IoMdMenu } from "react-icons/io";
+import { FaExternalLinkAlt } from "react-icons/fa";
 import { LuUpload } from "react-icons/lu";
 import { colors } from "../../utils/colors";
 
@@ -26,6 +30,8 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
   speedParcelIsActive,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [connectionStringMenuOpen, setConnectionStringMenuOpen] =
+    useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -117,23 +123,24 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
 
   return (
     <>
-      {isLoading && (
-        <Portal>
-          <Box
-            position="fixed"
-            inset={0}
-            aria-busy="true"
-            userSelect="none"
-            bg="bg/80"
-            zIndex="toast" // higher than modal/dialog
-          >
-            <Center h="full">
-              <Spinner size="xl" color={colors.purple} />
-              <Text paddingLeft="2rem">Loading...</Text>
-            </Center>
-          </Box>
-        </Portal>
-      )}
+      {isLoading ||
+        (isUploading && (
+          <Portal>
+            <Box
+              position="fixed"
+              inset={0}
+              aria-busy="true"
+              userSelect="none"
+              bg="bg/80"
+              zIndex="toast" // higher than modal/dialog
+            >
+              <Center h="full">
+                <Spinner size="xl" color={colors.purple} />
+                <Text paddingLeft="2rem">Loading...</Text>
+              </Center>
+            </Box>
+          </Portal>
+        ))}
       {/* ===== MENU ===== */}
       <Menu.Root open={menuOpen} onOpenChange={(e) => setMenuOpen(e.open)}>
         <Menu.Trigger asChild>
@@ -159,8 +166,28 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
                 {speedParcelIsActive ? " (must have it selected)" : ""}
               </Menu.Item>
 
-              <Menu.Item value="import_data" onClick={openImportDialog}>
-                Import data from file(s)
+              <Menu.Item
+                value="import_data"
+                onClick={openImportDialog}
+                disabled={speedParcelIsActive}
+              >
+                <FiUpload style={{ marginRight: "0.5rem" }} />
+                Import data from file{" "}
+                {speedParcelIsActive ? " (must have playground selected)" : ""}
+              </Menu.Item>
+              <Menu.Item
+                value="show_neo4j_browser"
+                onClick={() => {
+                  setConnectionStringMenuOpen(true);
+                }}
+              >
+                <FaExternalLinkAlt style={{ marginRight: "0.5rem" }} />
+                <Link
+                  target="_blank"
+                  href="https://console-preview.neo4j.io/tools/query"
+                >
+                  View graph data in Neo4j Browser
+                </Link>
               </Menu.Item>
             </Menu.Content>
           </Menu.Positioner>
@@ -186,7 +213,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
               </Dialog.Body>
 
               <Dialog.Footer>
-                <Button colorPalette="red" onClick={handleReset}>
+                <Button disabled colorPalette="red" onClick={handleReset}>
                   Reset
                 </Button>
               </Dialog.Footer>
@@ -254,6 +281,60 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
                 </Button>
               </Dialog.Footer>
 
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" />
+              </Dialog.CloseTrigger>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+
+      {/* ===== DIALOG: Show Connection String for Database ===== */}
+      <Dialog.Root
+        open={connectionStringMenuOpen}
+        onOpenChange={(e) => setConnectionStringMenuOpen(e.open)}
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content backgroundColor={colors.cream}>
+              <Dialog.Header>
+                <Dialog.Title>
+                  Connect to{" "}
+                  {speedParcelIsActive ? "SpeedParcel" : "Playground"} Database
+                  with this information
+                </Dialog.Title>
+              </Dialog.Header>
+
+              <Dialog.Body>
+                <p>
+                  <b>URL: </b>
+                  {speedParcelIsActive
+                    ? process.env.REACT_APP_LOCAL_SPEEDPARCEL_NEO4J_URI
+                    : process.env.REACT_APP_LOCAL_PLAYGROUND_NEO4J_URI}{" "}
+                  <Clipboard.Root
+                    display="inline"
+                    marginLeft="0.5rem"
+                    value={
+                      speedParcelIsActive
+                        ? process.env.REACT_APP_LOCAL_SPEEDPARCEL_NEO4J_URI
+                        : process.env.REACT_APP_LOCAL_PLAYGROUND_NEO4J_URI
+                    }
+                  >
+                    <Clipboard.Trigger asChild>
+                      <Link as="span" color="blue.fg" textStyle="sm">
+                        <Clipboard.Indicator />
+                      </Link>
+                    </Clipboard.Trigger>
+                  </Clipboard.Root>
+                </p>
+                <p>
+                  <b>Username:</b> neo4j
+                </p>
+                <p>
+                  <b>Password:</b> password
+                </p>
+              </Dialog.Body>
               <Dialog.CloseTrigger asChild>
                 <CloseButton size="sm" />
               </Dialog.CloseTrigger>
