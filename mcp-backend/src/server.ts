@@ -15,6 +15,14 @@ import { importArchiXmlFromNeo4jImportDir } from "./apoc-transpiler/transpile.js
 import { upload } from "./apoc-transpiler/uploader.js";
 import summarizeGraphSchema from "./schema-helper.js";
 
+// Chat history type
+type ChatTurn = {
+  user: string;
+  agent: string;
+  updatedAt: number;
+};
+const lastTurnBySession = new Map<string, ChatTurn>();
+
 // --------------------
 // OpenAI Client Setup
 // --------------------
@@ -269,13 +277,24 @@ app.get("/health", (_req, res) => {
 // ------------------------------------
 app.post("/api/neo4j/query", async (req, res) => {
   try {
-    const { prompt } = req.body as { prompt?: string };
+    const { prompt, sessionId } = req.body as {
+      prompt?: string;
+      sessionId?: string;
+    };
 
-    if (!prompt || typeof prompt !== "string") {
-      return res
-        .status(400)
-        .json({ error: "Missing or invalid 'prompt' in body" });
+    if (!sessionId || !prompt) {
+      return res.status(400).json({ error: "Missing sessionId or prompt" });
     }
+
+    const lastTurn = lastTurnBySession.get(sessionId);
+
+    const promptWithContext = lastTurn
+      ? `Previous conversation turn:
+          User: ${lastTurn.user}
+          Agent: ${lastTurn.agent}
+
+          New user question: ${prompt}`
+      : prompt;
 
     // 1) Fetch schema dynamically from MCP server (can be cached)
     const schemaResult = await readCypher(`
@@ -285,7 +304,10 @@ app.post("/api/neo4j/query", async (req, res) => {
     const schemaText = summarizeGraphSchema(schemaResult);
 
     // 2) Convert NL → initial Cypher
-    let cypher = await nlToCypher(prompt, schemaText);
+
+    console.log("[API] Generating Cypher for prompt:", promptWithContext);
+
+    let cypher = await nlToCypher(promptWithContext, schemaText);
     console.log("[LLM] Generated Cypher:", cypher);
 
     // 3) Execute Cypher via MCP
@@ -317,7 +339,14 @@ app.post("/api/neo4j/query", async (req, res) => {
     }*/
 
     // 4) Turn result into a natural-language explanation
-    const answer = await explainResult(prompt, cypher, rows);
+    const answer = await explainResult(promptWithContext, cypher, rows);
+
+    // Save the last turn in context
+    lastTurnBySession.set(sessionId, {
+      user: prompt, // store the raw new question (not promptWithContext)
+      agent: answer, // store the final response
+      updatedAt: Date.now(),
+    });
 
     // 5) Send answer (plus debug info) back to frontend
     res.json({

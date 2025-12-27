@@ -29,20 +29,29 @@ export default function App() {
 
   const [activeDb, setActiveDb] = useState<ActiveDb>(() => loadActiveDb());
 
+  const newSessionId = () =>
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
   const handleDbChange = (db: ActiveDb) => {
+    // Clear session ID and set a new one when database is toggled
+    controllerRef.current?.abort();
+    controllerRef.current = null;
+    bufferRef.current = "";
+    sessionIdRef.current = newSessionId();
     setActiveDb(db);
+    setChatHistory([]);
   };
 
   const controllerRef = useRef<AbortController | null>(null);
   const bufferRef = useRef<string>("");
 
-  // Append streamed tokens to visible output + buffer
-  const appendTokenToUI = useCallback((chunk: string) => {
-    if (!chunk || chunk === "[DONE]") return;
-    bufferRef.current += chunk;
-    setOutput((prev) => prev + chunk);
-  }, []);
-
+  const sessionIdRef = useRef<string>(
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2)}`
+  );
   const startStream = useCallback(async () => {
     if (isStreaming || !userPrompt.trim()) return;
 
@@ -59,7 +68,10 @@ export default function App() {
       const res = await fetch("http://localhost:4000/api/neo4j/query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: userPrompt }),
+        body: JSON.stringify({
+          prompt: userPrompt,
+          sessionId: sessionIdRef.current,
+        }),
         signal: controllerRef.current.signal,
       });
 
