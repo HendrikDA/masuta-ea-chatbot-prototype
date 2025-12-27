@@ -13,6 +13,7 @@ import {
 import OpenAI from "openai";
 import { importArchiXmlFromNeo4jImportDir } from "./apoc-transpiler/transpile.js";
 import { upload } from "./apoc-transpiler/uploader.js";
+import summarizeGraphSchema from "./schema-helper.js";
 
 // --------------------
 // OpenAI Client Setup
@@ -35,30 +36,51 @@ app.use(express.json());
 // ------------------------------------
 async function nlToCypher(nlPrompt: string, schema: string) {
   const systemPrompt = `
-You are an expert Cypher generator for a Neo4j-based Enterprise Architecture knowledge graph.
+You are working with a Neo4j graph whose structure is described in the schema summary.
 
-You receive:
-1) A natural-language request.
-2) The Neo4j schema.
+Important rules:
+- Do not assume fixed labels like :Application or :Chunk unless they appear in the schema.
+- Infer meaning from label names (e.g. ApplicationComponent ≈ application).
+- Prefer relationships such as SERVING, REALIZATION, SUPPORTS when present.
+- If no text-centric nodes exist, answer using structural relationships.
 
-Very important modeling hints:
-- More data is stored in different nodes. The database consists of the nodes Application, BusinessObject, Capability, Chunk, Concept, Document, Embedding, and Section
-- The main textual and textbook knowledge is usually stored in :Chunk nodes (properties like 'text', 'context', 'table_summary').
-- Information about the business objects are stored in the :BusinessObject nodes and Association relationships
-- Information about the business capability support matrix (e.g. which applications support which capabilities) is stored in the :Capability nodes and SUPPORTS relationships.
-- The main *textual* knowledge is usually stored in nodes with the label :Chunk
-  (e.g. properties like 'text', 'context', 'table_summary', etc.).
-- Higher-level nodes like :Concept often only provide structure, but not the full text.
-- When the user asks about explanations, definitions, or long-form content, you should
-  primarily use :Chunk nodes as the source and optionally traverse from them to other nodes.
-- Only use labels, properties, and relationships that actually exist in the schema input.
-- Do NOT invent labels, relationship types, or properties.
+ArchiMate interpretation hints:
+- Labels containing "Application" usually represent applications or application services.
+- Labels containing "Business" represent business-layer concepts.
+- Relationships named REALIZATION, SERVING, ASSIGNMENT often express "supports" or "implements".
+- Use node property "name" as the primary identifier unless otherwise specified.
+
+Query strategy: structural traversal over ArchiMate application & business layers.
+Graph traversal strategy (important):
+- Multi-hop traversal is allowed and often needed. Use 1..3 hops.
+- Do NOT invent relationship types like INFLUENCES/CAUSES/etc unless they are explicitly listed in the schema context.
+- If you are unsure which relationship types connect the nodes, do a bounded generic traversal:
+    MATCH (start)-[r*1..3]-(end)
+  and then filter by end-node labels and/or end-node properties (e.g., name).
+- Prefer filtering by labels and name-like properties rather than guessing relationship types.
+
+Traversal decision heuristic:
+- Use 1 hop for direct relationships (e.g. "which capability supports X").
+- Use 2–3 hops for indirect effects (e.g. "what are the consequences of X").
+- If the question implies a chain of influence, model it as a path, not a single edge.
+
+Name matching:
+- If the schema shows a 'name' property, use it.
+- If uncertain, match on any of these properties if present: name, label, title, documentation.
+- Use case-insensitive CONTAINS for the starting node when exact match might fail.
 
 Your task:
 - Write a SINGLE valid Cypher query.
 - Make a best effort to use :Chunk (and its relevant properties) when the question
   asks about information that would typically come from text.
 - Output ONLY Cypher. No explanations.
+
+Cypher syntax rules (important):
+- Do NOT use exists(node.property).
+- Neo4j 5+ requires property existence checks to use:
+    node.property IS NOT NULL
+- Always use "IS NOT NULL" instead of "exists(...)"
+- Do NOT use EXPLAIN or PROFILE, and do NOT wrap the query in CALL { ... } subqueries; always produce a top-level MATCH … RETURN query.
 `;
 
   const userPrompt = `
@@ -86,7 +108,7 @@ ${schema}
 // ------------------------------------
 // Helper: refine fallback cyphers
 // ------------------------------------
-async function refineCypherForChunks(
+/*async function refineCypherForChunks(
   nlPrompt: string,
   previousCypher: string,
   schema: string
@@ -134,7 +156,7 @@ ${schema}
   if (!cypher) throw new Error("LLM fallback returned no Cypher");
 
   return cypher;
-}
+}*/
 
 // ------------------------------------
 // Helper: explain result in natural language (Markdown)
@@ -152,7 +174,7 @@ You are given:
 - The resulting rows from the query.
 
 Your task:
-- Provide a concise, helpful explanation, usually within 3–6 sentences but it may be more if the request is complex.
+- Provide a concise, helpful explanation. Usually within 1–6 sentences. If a question is straightforward to answer, then a brief answer is appropriate, but it may be more if the request is complex.
 - Speak like an experienced EA explaining the findings to a junior colleague.
 - Do not mention the Cypher, queries, or other technical details unless relevant to the explanation.
 - Refer to concrete numbers or entities from the result when relevant.
@@ -254,7 +276,8 @@ app.post("/api/neo4j/query", async (req, res) => {
     const schemaResult = await readCypher(`
       CALL db.schema.visualization()
     `);
-    const schemaText = JSON.stringify(schemaResult, null, 2);
+
+    const schemaText = summarizeGraphSchema(schemaResult);
 
     // 2) Convert NL → initial Cypher
     let cypher = await nlToCypher(prompt, schemaText);
@@ -264,7 +287,7 @@ app.post("/api/neo4j/query", async (req, res) => {
     let rows: unknown = await readCypher(cypher);
 
     // 3a) If no rows, try a fallback focusing on :Chunk
-    if (Array.isArray(rows) && rows.length === 0) {
+    /*if (Array.isArray(rows) && rows.length === 0) {
       console.log(
         "[API] No rows returned, trying fallback Cypher focused on :Chunk…"
       );
@@ -286,7 +309,7 @@ app.post("/api/neo4j/query", async (req, res) => {
       } else {
         console.log("[API] Fallback query also returned no rows.");
       }
-    }
+    }*/
 
     // 4) Turn result into a natural-language explanation
     const answer = await explainResult(prompt, cypher, rows);
