@@ -220,9 +220,14 @@ export async function resetPlaygroundGraphDatabase() {
 
   const batchQuery = `
     MATCH (n)
-    WITH n LIMIT 10000
-    DETACH DELETE n
-    RETURN count(n) AS deleted
+    WHERE NOT (
+      n:Chunk OR
+      n:Concept OR
+      n:Document OR
+      n:Embedding OR
+      n:Section
+    )
+    DETACH DELETE n;
   `;
 
   let total = 0;

@@ -216,7 +216,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
               </Dialog.Body>
 
               <Dialog.Footer>
-                <Button disabled colorPalette="red" onClick={handleReset}>
+                <Button colorPalette="red" onClick={handleReset}>
                   Reset
                 </Button>
               </Dialog.Footer>
