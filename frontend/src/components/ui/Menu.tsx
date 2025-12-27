@@ -274,7 +274,6 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
               </Dialog.Body>
 
               <Dialog.Footer>
-                {/* Replace with your actual import handler */}
                 <Button
                   onClick={() => handleXmlImport()}
                   isLoading={isUploading}
