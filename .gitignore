@@ -3,16 +3,16 @@
 
 # Ignore all contents of these folders
 graph-data/*
-lehrbuch-data/*
+textbook-data/*
 speedparcel-data/*
 
 # Re-allow the folders themselves
 !graph-data/
-!lehrbuch-data/
+!textbook-data/
 !speedparcel-data/
 
 # Re-allow placeholder files
-!lehrbuch-data/.gitkeep
+!textbook-data/.gitkeep
 !speedparcel-data/.gitkeep
 !graph-data/.gitkeep
 

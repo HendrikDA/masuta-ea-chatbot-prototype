@@ -42,7 +42,7 @@ Populate the databases with example data
 
 ```
 docker compose --profile speedparcel-restore run --rm speedparcel-restore
-docker compose --profile lehrbuch-restore  run --rm lehrbuch-restore
+docker compose --profile textbook-restore  run --rm textbook-restore
 ```
 
 Execute all containers
