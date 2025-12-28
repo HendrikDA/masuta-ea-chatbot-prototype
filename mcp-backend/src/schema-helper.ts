@@ -1,79 +1,187 @@
-export default function summarizeGraphSchema(schemaResult: any): string {
-  // MCP usually wraps rows → unwrap defensively
-  const root = Array.isArray(schemaResult?.rows)
-    ? schemaResult.rows[0]
-    : Array.isArray(schemaResult)
-    ? schemaResult[0]
-    : schemaResult;
+// src/schema-helper.ts
+type IndexRow = {
+  name?: string;
+  type?: string; // RANGE / FULLTEXT / VECTOR / LOOKUP ...
+  entityType?: string;
+  labelsOrTypes?: string[] | string;
+  properties?: string[] | string;
+  state?: string;
+  uniqueness?: string;
+  indexProvider?: string;
+};
 
-  const nodes = root?.nodes ?? [];
-  const relationships = root?.relationships ?? [];
+function firstRow(raw: any): any | null {
+  if (!raw) return null;
+  if (Array.isArray(raw.rows) && raw.rows.length > 0) return raw.rows[0];
+  return null;
+}
 
-  // --- Collect labels ---
-  const labels = new Set<string>();
-  for (const n of nodes) {
-    if (Array.isArray(n.labels)) {
-      n.labels.forEach((l: string) => labels.add(l));
-    }
+function unwrapUsingColumns(raw: any): any | null {
+  const row = firstRow(raw);
+  const cols = Array.isArray(raw?.columns) ? raw.columns : null;
+  if (!row || !cols || cols.length === 0) return null;
+
+  const firstCol = cols[0];
+  if (row && Object.prototype.hasOwnProperty.call(row, firstCol)) {
+    return row[firstCol];
+  }
+  return null;
+}
+
+function unwrapApocMetaSchema(raw: any): any {
+  if (!raw) return {};
+
+  // ✅ Your case: array of records like [{ value: {...} }]
+  if (Array.isArray(raw)) {
+    const first = raw[0];
+    if (first?.value && typeof first.value === "object") return first.value;
+    if (first?.schema && typeof first.schema === "object") return first.schema;
+    return {};
   }
 
-  // --- Collect relationship patterns ---
-  const relPatterns = new Set<string>();
-  for (const r of relationships) {
-    if (r.startNode && r.endNode && r.type) {
-      relPatterns.add(
-        `(:${r.startNode.labels?.[0] ?? "?"})-[:${r.type}]->(:${
-          r.endNode.labels?.[0] ?? "?"
-        })`
-      );
-    }
-  }
+  // MCP-style { columns: [...], rows: [...] }
+  const byCols = unwrapUsingColumns(raw);
+  if (byCols && typeof byCols === "object") return byCols;
 
-  // --- Heuristic grouping (very important) ---
-  const applicationLabels = [...labels].filter((l) =>
-    l.toLowerCase().includes("application")
-  );
-  const businessLabels = [...labels].filter(
-    (l) =>
-      l.toLowerCase().includes("business") ||
-      l.toLowerCase().includes("process") ||
-      l.toLowerCase().includes("capability") ||
-      l.toLowerCase().includes("actor") ||
-      l.toLowerCase().includes("role")
-  );
-  const technologyLabels = [...labels].filter(
-    (l) =>
-      l.toLowerCase().includes("node") ||
-      l.toLowerCase().includes("technology") ||
-      l.toLowerCase().includes("system")
-  );
+  const row = firstRow(raw);
+  if (row?.value && typeof row.value === "object") return row.value;
+  if (row?.schema && typeof row.schema === "object") return row.schema;
+
+  // Already a map
+  if (raw && typeof raw === "object" && !raw.rows && !raw.columns) return raw;
+
+  return {};
+}
+
+function unwrapShowIndexes(raw: any): IndexRow[] {
+  if (!raw) return [];
+  if (Array.isArray(raw.rows)) return raw.rows as IndexRow[];
+  if (Array.isArray(raw)) return raw as IndexRow[];
+  return [];
+}
+
+function normalizeList(v: any): string[] {
+  if (!v) return [];
+  if (Array.isArray(v)) return v.map(String);
+  if (typeof v === "string") return [v];
+  return [String(v)];
+}
+
+export default function summarizeGraphSchema(
+  apocMetaSchemaRaw: any,
+  showIndexesRaw: any
+): string {
+  const schemaMap = unwrapApocMetaSchema(apocMetaSchemaRaw);
+  const indexRows = unwrapShowIndexes(showIndexesRaw);
+
+  const nodeEntries = Object.entries(schemaMap).filter(
+    ([, v]: any) => v?.type === "node"
+  ) as Array<[string, any]>;
+
+  const relEntries = Object.entries(schemaMap).filter(
+    ([, v]: any) => v?.type === "relationship"
+  ) as Array<[string, any]>;
+
+  const labelsBlock = nodeEntries
+    .map(([label, info]) => {
+      const props = info?.properties ?? {};
+      const propLines = Object.entries(props)
+        .map(([k, meta]: any) => {
+          const type = meta?.type ? String(meta.type) : "UNKNOWN";
+          const idx = meta?.indexed ? " indexed" : "";
+          const uniq = meta?.unique ? " unique" : "";
+          return `  - ${k}: ${type}${idx}${uniq}`;
+        })
+        .sort()
+        .join("\n");
+
+      const rels = info?.relationships ?? {};
+      const relLines = Object.entries(rels)
+        .map(([relType, relMeta]: any) => {
+          const dir = relMeta?.direction ? String(relMeta.direction) : "?";
+          const targets =
+            normalizeList(relMeta?.labels).join("|") || "(unknown)";
+          const arrow = dir === "out" ? "->" : dir === "in" ? "<-" : "-";
+          const cnt =
+            typeof relMeta?.count === "number"
+              ? ` (count≈${relMeta.count})`
+              : "";
+          return `  - (:${label})-[:${relType}]${arrow}(:${targets})${cnt}`;
+        })
+        .sort()
+        .join("\n");
+
+      return `Label :${label} (count≈${info?.count ?? "?"})
+Properties:
+${propLines || "  - (none found)"}
+Relationships:
+${relLines || "  - (none found)"}`;
+    })
+    .join("\n\n");
+
+  const relTypesBlock = relEntries
+    .map(([t, v]) => `- :${t} (count≈${v?.count ?? "?"})`)
+    .sort()
+    .join("\n");
+
+  const vectorIndexes = indexRows
+    .filter((r) =>
+      String(r.type ?? "")
+        .toUpperCase()
+        .includes("VECTOR")
+    )
+    .map((r: any) => {
+      const lot = normalizeList(r.labelsOrTypes).join("|");
+      const props = normalizeList(r.properties).join(", ");
+      return `- ${r.name} on ${lot}(${props})`;
+    });
+
+  const fulltextIndexes = indexRows
+    .filter((r) =>
+      String(r.type ?? "")
+        .toUpperCase()
+        .includes("FULLTEXT")
+    )
+    .map((r: any) => {
+      const lot = normalizeList(r.labelsOrTypes).join("|");
+      const props = normalizeList(r.properties).join(", ");
+      return `- ${r.name} on ${lot}(${props})`;
+    });
+
+  const otherIndexes = indexRows
+    .filter(
+      (r) =>
+        !String(r.type ?? "")
+          .toUpperCase()
+          .includes("VECTOR") &&
+        !String(r.type ?? "")
+          .toUpperCase()
+          .includes("FULLTEXT")
+    )
+    .slice(0, 25)
+    .map((r: any) => {
+      const lot = normalizeList(r.labelsOrTypes).join("|");
+      const props = normalizeList(r.properties).join(", ");
+      return `- ${r.name} [${r.type}] on ${lot}(${props})`;
+    });
 
   return `
-GRAPH SCHEMA SUMMARY
+Schema summary (from apoc.meta.schema + SHOW INDEXES)
 
-Node labels present:
-${[...labels]
-  .sort()
-  .map((l) => `- ${l}`)
-  .join("\n")}
+Labels & properties:
+${labelsBlock || "- (none found)"}
 
-Application-layer nodes:
-${applicationLabels.map((l) => `- ${l}`).join("\n") || "- (none)"}
+Relationship types:
+${relTypesBlock || "- (none found)"}
 
-Business-layer nodes:
-${businessLabels.map((l) => `- ${l}`).join("\n") || "- (none)"}
+Indexes (use as query entry points):
+Vector indexes:
+${vectorIndexes.join("\n") || "- (none found)"}
 
-Technology-layer nodes:
-${technologyLabels.map((l) => `- ${l}`).join("\n") || "- (none)"}
+Fulltext indexes:
+${fulltextIndexes.join("\n") || "- (none found)"}
 
-Observed relationship patterns:
-${[...relPatterns]
-  .slice(0, 15)
-  .map((p) => `- ${p}`)
-  .join("\n")}
-
-Notes:
-- Use property 'name' as the primary identifier unless stated otherwise.
-- Prefer structural traversal using REALIZATION, SERVING, SUPPORTS, ASSIGNMENT when present.
+Other indexes (sample):
+${otherIndexes.join("\n") || "- (none found)"}
 `.trim();
 }

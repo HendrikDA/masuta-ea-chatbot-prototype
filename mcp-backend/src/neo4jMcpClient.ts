@@ -101,7 +101,10 @@ export async function ensureNeo4jMcp(useSpeedparcel: boolean = false) {
   }
 }
 
-export async function readCypher(query: string) {
+export async function readCypher(
+  query: string,
+  params: Record<string, any> = {}
+) {
   if (!client) {
     throw new Error(
       "Neo4j MCP client not initialized. Call ensureNeo4jMcp() first."
@@ -113,7 +116,7 @@ export async function readCypher(query: string) {
       method: "tools/call",
       params: {
         name: "read-cypher",
-        arguments: { query },
+        arguments: { query, params },
       },
     },
     CallToolResultSchema

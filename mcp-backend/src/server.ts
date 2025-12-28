@@ -49,38 +49,20 @@ You are working with a Neo4j graph whose structure is described in the schema su
 Important rules:
 - Do not assume fixed labels like :Application or :Chunk unless they appear in the schema.
 - Infer meaning from label names (e.g. ApplicationComponent ≈ application).
-- Prefer relationships such as SERVING, REALIZATION, SUPPORTS when present.
 - If no text-centric nodes exist, answer using structural relationships.
 
-ArchiMate interpretation hints:
-- Labels containing "Application" usually represent applications or application services.
-- Labels containing "Business" represent business-layer concepts.
-- Relationships named REALIZATION, SERVING, ASSIGNMENT often express "supports" or "implements".
-- Use node property "name" as the primary identifier unless otherwise specified.
-
-Query strategy: structural traversal over ArchiMate application & business layers.
-Graph traversal strategy (important):
-- Multi-hop traversal is allowed and often needed. Use 1..3 hops.
-- Do NOT invent relationship types like INFLUENCES/CAUSES/etc unless they are explicitly listed in the schema context.
-- If you are unsure which relationship types connect the nodes, do a bounded generic traversal:
-    MATCH (start)-[r*1..3]-(end)
-  and then filter by end-node labels and/or end-node properties (e.g., name).
-- Prefer filtering by labels and name-like properties rather than guessing relationship types.
-
-Traversal decision heuristic:
-- Use 1 hop for direct relationships (e.g. "which capability supports X").
-- Use 2–3 hops for indirect effects (e.g. "what are the consequences of X").
-- If the question implies a chain of influence, model it as a path, not a single edge.
-
-Name matching:
-- If the schema shows a 'name' property, use it.
-- If uncertain, match on any of these properties if present: name, label, title, documentation.
-- Use case-insensitive CONTAINS for the starting node when exact match might fail.
+Index usage based on the schema information passed to you:
+- If the schema summary lists a VECTOR index relevant to the task, start with:
+  CALL db.index.vector.queryNodes("<indexName>", $embedding, <k>) YIELD node, score
+- If the schema summary lists a FULLTEXT index relevant to the task, start with:
+  CALL db.index.fulltext.queryNodes("<indexName>", $query, {limit: <k>}) YIELD node, score
+  (Do NOT pass a bare integer as the 3rd argument.)
+- After any CALL ... YIELD, you MUST finish with a RETURN clause.
+  Example: CALL ... YIELD node, score RETURN node, score
+- Otherwise use MATCH with WHERE + indexed properties.
 
 Your task:
 - Write a SINGLE valid Cypher query.
-- Make a best effort to use :Chunk (and its relevant properties) when the question
-  asks about information that would typically come from text.
 - Output ONLY Cypher. No explanations.
 
 Cypher syntax rules (important):
@@ -88,7 +70,8 @@ Cypher syntax rules (important):
 - Neo4j 5+ requires property existence checks to use:
     node.property IS NOT NULL
 - Always use "IS NOT NULL" instead of "exists(...)"
-- Do NOT use EXPLAIN or PROFILE, and do NOT wrap the query in CALL { ... } subqueries; always produce a top-level MATCH … RETURN query.
+- NEVER use EXPLAIN or PROFILE. Always output an executable query that ends with RETURN.
+- You MAY start with CALL db.index.fulltext.queryNodes(...) or CALL db.index.vector.queryNodes(...).
 `;
 
   const userPrompt = `
@@ -297,21 +280,27 @@ app.post("/api/neo4j/query", async (req, res) => {
       : prompt;
 
     // 1) Fetch schema dynamically from MCP server (can be cached)
-    const schemaResult = await readCypher(`
-      CALL db.schema.visualization()
-    `);
+    const apocSchemaRaw = await readCypher(`CALL apoc.meta.schema();`);
+    const indexesRaw = await readCypher(`SHOW INDEXES;`);
 
-    const schemaText = summarizeGraphSchema(schemaResult);
+    console.log("Apoc schema raw:", JSON.stringify(apocSchemaRaw));
+
+    const schemaText = summarizeGraphSchema(apocSchemaRaw, indexesRaw);
+    console.log("Schema summary:\n", schemaText);
 
     // 2) Convert NL → initial Cypher
 
-    console.log("[API] Generating Cypher for prompt:", promptWithContext);
-
     let cypher = await nlToCypher(promptWithContext, schemaText);
-    console.log("[LLM] Generated Cypher:", cypher);
 
     // 3) Execute Cypher via MCP
-    let rows: unknown = await readCypher(cypher);
+    const cypherParams: Record<string, any> = {};
+
+    // If the generated Cypher references $query, provide it:
+    if (/\$query\b/.test(cypher)) {
+      cypherParams.query = prompt; // <-- the user's question string
+    }
+
+    let rows: unknown = await readCypher(cypher, cypherParams);
 
     // 3a) If no rows, try a fallback focusing on :Chunk
     /*if (Array.isArray(rows) && rows.length === 0) {
@@ -373,8 +362,6 @@ app.post("/api/neo4j/togglespeedparcel", async (req, res) => {
         .status(400)
         .json({ error: "Missing or invalid 'use_speedparcel' in body" });
     }
-
-    console.log("Toggling. Using SpeedParcel data?:", use_speedparcel);
 
     await ensureNeo4jMcp(use_speedparcel);
 

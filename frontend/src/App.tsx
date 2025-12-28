@@ -253,7 +253,7 @@ export default function App() {
                   textAlign: "left",
                 }}
               >
-                <Text fontWeight="bold">Agent</Text>
+                <Text fontWeight="bold">Masutā</Text>
                 <div
                   style={{
                     backgroundColor: colors.lightBlue,

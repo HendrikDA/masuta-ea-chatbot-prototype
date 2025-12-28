@@ -189,7 +189,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
                   border="none"
                 >
                   <FaExternalLinkAlt style={{ marginRight: "0.5rem" }} />
-                  View graph data in Neo4j Browser
+                  View graph data in neo4j Browser
                 </Link>
               </Menu.Item>
             </Menu.Content>
