@@ -174,7 +174,6 @@ export default function App() {
             // H3 header ends with a dash: '### Title- ' → '### Title\n'
             .replace(/(###\s.+?)-\s+/g, "$1\n")
             // newline after sentence punctuation before a "-" (list item)
-            .replace(/([.:;])\s*-\s/g, "$1\n- ")
             .replace(/([.!?])\s*###\s*/g, "$1\n\n### ")
             .replace(/(\d+\.)\s*/g, "\n$1 ")
 
