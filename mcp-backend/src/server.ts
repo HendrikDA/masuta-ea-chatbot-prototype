@@ -295,37 +295,11 @@ app.post("/api/neo4j/query", async (req, res) => {
     // 3) Execute Cypher via MCP
     const cypherParams: Record<string, any> = {};
 
-    // If the generated Cypher references $query, provide it:
     if (/\$query\b/.test(cypher)) {
-      cypherParams.query = prompt; // <-- the user's question string
+      cypherParams.query = prompt;
     }
 
     let rows: unknown = await readCypher(cypher, cypherParams);
-
-    // 3a) If no rows, try a fallback focusing on :Chunk
-    /*if (Array.isArray(rows) && rows.length === 0) {
-      console.log(
-        "[API] No rows returned, trying fallback Cypher focused on :Chunk…"
-      );
-      const fallbackCypher = await refineCypherForChunks(
-        prompt,
-        cypher,
-        schemaText
-      );
-      console.log("[LLM] Fallback Cypher:", fallbackCypher);
-
-      const fallbackRows = await readCypher(fallbackCypher);
-
-      if (Array.isArray(fallbackRows) && fallbackRows.length > 0) {
-        console.log(
-          "[API] Fallback query returned rows, using fallback result."
-        );
-        cypher = fallbackCypher;
-        rows = fallbackRows;
-      } else {
-        console.log("[API] Fallback query also returned no rows.");
-      }
-    }*/
 
     // 4) Turn result into a natural-language explanation
     const answer = await explainResult(promptWithContext, cypher, rows);

@@ -159,6 +159,7 @@ export default function App() {
           </Heading>
         )}
         {chatHistory.map((msg, idx) => {
+          console.log("Rendering message:", msg);
           const baseStyle: React.CSSProperties = {
             width: "90%",
             marginBottom: "0.5rem",
