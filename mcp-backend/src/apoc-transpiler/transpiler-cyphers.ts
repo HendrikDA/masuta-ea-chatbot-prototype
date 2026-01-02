@@ -8,10 +8,12 @@ CALL apoc.load.xml(
 WITH
   el.identifier AS id,
   el['xsi:type'] AS archiType,
-  head([c IN coalesce(el._element, []) WHERE c._type = 'name' | c._text]) AS name
+  head([c IN coalesce(el._element, []) WHERE c._type = 'name' | c._text]) AS name,
+  head([c IN coalesce(el._element, []) WHERE c._type = 'documentation' | c._text]) AS documentation
 WHERE id IS NOT NULL
 MERGE (n:ArchiElement {id: id})
 SET n.name = name,
+    n.documentation = documentation,
     n.archiType = archiType
 WITH n, archiType
 WHERE archiType IS NOT NULL
