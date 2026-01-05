@@ -83,7 +83,7 @@ services:
       - $HOME/neo4j_empty/config:/config
       - $HOME/neo4j_empty/data:/data
       - $HOME/neo4j_empty/plugins:/plugins
-      - /Users/U777053/Documents/Uni/FraUAS/Masterarbeit/prototype/graphdb-parser/sources/Data:/var/lib/neo4j/import/data # This loads example data so that apoc calls can be made
+      - ./graphdb-parser/sources/Data:/var/lib/neo4j/import/data # This loads example data so that apoc calls can be made
     ports:
       - "7475:7474"
       - "7688:7687"
@@ -111,7 +111,6 @@ services:
       - LOCAL_SPEEDPARCEL_NEO4J_URI=bolt://neo4j_speedparcel:7687
       - LOCAL_PLAYGROUND_NEO4J_URI=bolt://neo4j_empty:7687
 
-      # creds/db names (use your existing .env values)
       - LOCAL_SPEEDPARCEL_NEO4J_USER=${LOCAL_NEO4J_DB_USERNAME}
       - LOCAL_SPEEDPARCEL_NEO4J_PASSWORD=${LOCAL_NEO4J_DB_PASSWORD}
       - LOCAL_SPEEDPARCEL_NEO4J_DATABASE=${LOCAL_SPEEDPARCEL_NEO4J_DATABASE}
@@ -122,7 +121,7 @@ services:
     volumes:
       - ./mcp-backend:/app
       - /app/node_modules
-      - /Users/U777053/Documents/Uni/FraUAS/Masterarbeit/prototype/graphdb-parser/sources/Data:/uploads # for file uploads
+      - ./graphdb-parser/sources/Data:/uploads # for file uploads
     depends_on:
       neo4j_speedparcel:
         condition: service_healthy
