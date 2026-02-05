@@ -10,6 +10,9 @@ import {
   writeCypher,
 } from "./neo4jMcpClient.js";
 
+import path from "node:path";
+import { promises as fs } from "node:fs";
+
 import OpenAI from "openai";
 import { importArchiXmlFromNeo4jImportDir } from "./apoc-transpiler/transpile.js";
 import { upload } from "./apoc-transpiler/uploader.js";
@@ -281,7 +284,7 @@ app.post("/api/neo4j/query", async (req, res) => {
           New user question: ${prompt}`
       : prompt;
 
-    // 1) Fetch schema dynamically from MCP server (can be cached)
+    // fetch schema dynamically from MCP server (can be cached)
     const apocSchemaRaw = await readCypher(`CALL apoc.meta.schema();`);
     const indexesRaw = await readCypher(`SHOW INDEXES;`);
 
@@ -290,7 +293,7 @@ app.post("/api/neo4j/query", async (req, res) => {
     const schemaText = summarizeGraphSchema(apocSchemaRaw, indexesRaw);
     console.log("Schema summary:\n", schemaText);
 
-    // 2) Convert NL → initial Cypher
+    // Convert natural language into initial Cypher
 
     let cypher = await nlToCypher(promptWithContext, schemaText);
 
@@ -303,7 +306,7 @@ app.post("/api/neo4j/query", async (req, res) => {
 
     let rows: unknown = await readCypher(cypher, cypherParams);
 
-    // 4) Turn result into a natural-language explanation
+    // Turn result into a natural-language explanation
     const answer = await explainResult(promptWithContext, cypher, rows);
 
     // Save the last turn in context
@@ -313,7 +316,33 @@ app.post("/api/neo4j/query", async (req, res) => {
       updatedAt: Date.now(),
     });
 
-    // 5) Send answer (plus debug info) back to frontend
+    // Write new chat history to file
+    try {
+      console.log("Writing chat history to file...");
+
+      const dir = path.join(process.cwd(), "protocols");
+      const filePath = path.join(dir, "chat_history.txt");
+
+      await fs.mkdir(dir, { recursive: true });
+      await fs.appendFile(
+        filePath,
+        `\n\n--- New Chat Turn ${new Date().toISOString()} ---\n`,
+        "utf-8",
+      );
+      await fs.appendFile(
+        filePath,
+        `Using DB Target: ${getCurrentDbTarget()}\n`,
+        "utf-8",
+      );
+      await fs.appendFile(filePath, `User: ${prompt}\n`, "utf-8");
+      await fs.appendFile(filePath, `Agent: ${answer}\n`, "utf-8");
+
+      console.log("Wrote chat history to:", filePath);
+    } catch (err) {
+      console.log("Error writing chat history file:", err);
+    }
+
+    // Send answer (plus debug info) back to frontend
     res.json({
       answer, // natural-language EA explanation (Markdown)
       cypher, // final Cypher used
