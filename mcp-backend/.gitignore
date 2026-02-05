@@ -4,4 +4,4 @@ dist/
 .DS_Store
 npm-debug.log
 .vscode/
-./protocols/*
+./protocols/chat_history.txt

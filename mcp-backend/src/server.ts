@@ -335,7 +335,8 @@ app.post("/api/neo4j/query", async (req, res) => {
         "utf-8",
       );
       await fs.appendFile(filePath, `User: ${prompt}\n`, "utf-8");
-      await fs.appendFile(filePath, `Agent: ${answer}\n`, "utf-8");
+      await fs.appendFile(filePath, `Agent:\n${answer}\n`, "utf-8");
+      await fs.appendFile(filePath, `Executed Cypher:\n${cypher}\n`, "utf-8");
 
       console.log("Wrote chat history to:", filePath);
     } catch (err) {
