@@ -155,7 +155,7 @@ ${schema}
 async function explainResult(
   userPrompt: string,
   cypher: string,
-  rows: unknown
+  rows: unknown,
 ) {
   const systemPrompt = `
 You are a senior enterprise architect mentoring a junior enterprise architect.
@@ -195,6 +195,8 @@ ${JSON.stringify(rows, null, 2)}
       { role: "user", content: userContent },
     ],
   });
+
+  console.log("All results: ", completion.choices);
 
   const answer = completion.choices?.[0]?.message?.content?.trim();
   if (!answer) throw new Error("LLM returned no answer");
@@ -243,7 +245,7 @@ export async function resetPlaygroundGraphDatabase() {
   }
 
   throw new Error(
-    `[RESET] Aborted after ${maxBatches} batches (deleted so far: ${total}).`
+    `[RESET] Aborted after ${maxBatches} batches (deleted so far: ${total}).`,
   );
 }
 
